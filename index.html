@@ -109,14 +109,18 @@
       font-size: .7rem; flex-shrink: 0;
     }
     .btn-del:hover { background: var(--red-bg); }
-    .btn-lock {
-      background: transparent; color: var(--text2); border: 1px solid var(--border);
-      padding: 0; width: 24px; height: 24px; border-radius: 6px;
+    .lock-badge {
+      position: absolute; top: -6px; right: -6px; width: 22px; height: 22px;
       display: flex; align-items: center; justify-content: center;
-      font-size: .72rem; flex-shrink: 0; cursor: pointer; transition: all .15s;
+      border-radius: 50%; z-index: 2; pointer-events: none;
+      transition: all .2s;
     }
-    .btn-lock:hover { border-color: var(--yellow); color: var(--yellow); }
-    .btn-lock.locked { background: rgba(255,200,50,.12); border-color: var(--yellow); color: var(--yellow); }
+    .lock-badge svg { width: 14px; height: 14px; }
+    .lock-badge.unlocked { color: var(--text2); opacity: .35; }
+    .lock-badge.locked {
+      color: var(--yellow); opacity: 1;
+      background: rgba(255,200,50,.15); border: 1px solid var(--yellow);
+    }
     #delivery-list li.delivery-locked { border-color: var(--yellow); box-shadow: 0 0 8px rgba(255,200,50,.15); }
 
     /* ── START DISPLAY ── */
@@ -764,8 +768,10 @@ function renderDeliveryList() {
     const noteDisplay = d.note ? `<div class="delivery-note" onclick="editNote(${d.id})" title="Cliquer pour modifier">${d.note}</div>` : '';
     const inputStyle = d.note ? 'display:none' : '';
     const legInfo = d.legDist && d.legDur ? `<div class="delivery-leg-info"><span>${d.legDist}</span><span>·</span><span>${d.legDur}</span></div>` : '';
-    const lockClass = d.locked ? 'btn-lock locked' : 'btn-lock';
-    const lockIcon = d.locked ? '&#128274;' : '&#128275;';
+    const badgeClass = d.locked ? 'lock-badge locked' : 'lock-badge unlocked';
+    const lockSvg = d.locked
+      ? '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'
+      : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>';
     const liClass = d.locked ? 'delivery-locked' : '';
     return `<li data-idx="${i}" data-id="${d.id}" class="${liClass}">
       <div class="drag-handle">&#8942;&#8942;</div>
@@ -774,12 +780,34 @@ function renderDeliveryList() {
         <input class="delivery-note-input" style="${inputStyle}" placeholder="Note (code, étage...)" value="" maxlength="44"
           onblur="saveNote(${d.id}, this.value)" data-id="${d.id}" />${legInfo}
       </div>
-      <button class="${lockClass}" onclick="toggleLock(${d.id})" title="Verrouiller la position">${lockIcon}</button>
+      <div class="${badgeClass}">${lockSvg}</div>
       <div class="swipe-bg">Supprimer</div>
     </li>`;
   }).join('');
   initDragAndDrop();
   initSwipeToDelete();
+  initDoubleTapLock();
+}
+function initDoubleTapLock() {
+  const items = document.querySelectorAll('#delivery-list li');
+  items.forEach(li => {
+    let lastTap = 0;
+    li.addEventListener('touchend', e => {
+      if (e.target.closest('.drag-handle') || e.target.closest('.delivery-note-input') || e.target.closest('.delivery-note')) return;
+      const now = Date.now();
+      if (now - lastTap < 300) {
+        e.preventDefault();
+        const id = parseInt(li.dataset.id);
+        toggleLock(id);
+      }
+      lastTap = now;
+    });
+    li.addEventListener('dblclick', e => {
+      if (e.target.closest('.drag-handle') || e.target.closest('.delivery-note-input') || e.target.closest('.delivery-note')) return;
+      const id = parseInt(li.dataset.id);
+      toggleLock(id);
+    });
+  });
 }
 function saveNote(id, note) {
   const d = state.deliveries.find(d => d.id === id);
