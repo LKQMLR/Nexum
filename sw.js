@@ -1,4 +1,4 @@
-const CACHE = 'nexum-v14';
+const CACHE = 'nexum-v15';
 const ASSETS = ['./index.html', './manifest.json'];
 
 self.addEventListener('install', e => {

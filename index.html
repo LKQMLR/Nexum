@@ -143,20 +143,6 @@
       transform: translateY(3px);
     }
     #delivery-list li.dragging { opacity: .15; }
-    #delivery-list li.delivered {
-      opacity: .5; border-color: var(--green);
-      background: var(--green-bg);
-    }
-    #delivery-list li.delivered .delivery-num {
-      background: var(--green); box-shadow: none;
-    }
-    #delivery-list li.delivered .delivery-addr::after {
-      content: ' — Livré'; color: var(--green); font-size: .7rem; font-weight: 600;
-    }
-    #delivery-list li.nav-current-stop {
-      border-color: var(--accent);
-      box-shadow: 0 0 8px rgba(79,140,255,.3);
-    }
     .delivery-num {
       background: linear-gradient(135deg, var(--accent), var(--accent2));
       color: #fff; border-radius: 6px;
@@ -271,6 +257,18 @@
     .step-badge.depot { background: linear-gradient(135deg, var(--green), #1a9a4a); box-shadow: 0 2px 6px rgba(34,197,94,.3); }
     .step-text { flex: 1; line-height: 1.35; word-break: break-word; color: var(--text); }
     .step-dist { font-size: .7rem; color: var(--text2); white-space: nowrap; }
+    #route-steps li.step-delivered {
+      opacity: .5; border-color: var(--green); background: var(--green-bg);
+    }
+    #route-steps li.step-delivered .step-badge {
+      background: var(--green); box-shadow: none;
+    }
+    #route-steps li.step-delivered .step-text::after {
+      content: ' — Livré'; color: var(--green); font-size: .7rem; font-weight: 600;
+    }
+    #route-steps li.step-current {
+      border-color: var(--accent); box-shadow: 0 0 8px rgba(79,140,255,.3);
+    }
 
     /* ── NAVIGATION ── */
     #btn-nav-start {
@@ -604,7 +602,7 @@ function restoreSession() {
           state.navIndex = data.navIndex;
           document.getElementById('btn-nav-start').classList.remove('visible');
           document.getElementById('nav-panel').classList.add('visible');
-          updateNavPanel();
+          updateNavPanel(); renderRouteSteps();
         }, 1000);
       }
     }
@@ -721,7 +719,6 @@ function renderDeliveryList() {
   const countEl = document.getElementById('delivery-count');
   countEl.textContent = state.deliveries.length ? `(${state.deliveries.length})` : '';
   if (!state.deliveries.length) { ul.innerHTML = ''; return; }
-  const navActive = document.getElementById('nav-panel').classList.contains('visible');
   ul.innerHTML = state.deliveries.map((d, i) => {
     const addr = d.formatted.length > 50 ? d.formatted.substring(0, 47) + '...' : d.formatted;
     const placeLabel = d.placeName ? `<div class="delivery-place-name">${d.placeName}</div>` : '';
@@ -998,6 +995,13 @@ function showResults(stops, legs, distM, durS) {
     <div class="summary-card"><span>Distance</span><strong>${km} km</strong></div>
     <div class="summary-card"><span>Durée</span><strong>${h > 0 ? h+'h '+m+'min' : m+' min'}</strong></div>
     <div class="summary-card"><span>Arrêts</span><strong>${state.deliveries.length}</strong></div>`;
+  renderRouteSteps();
+  document.getElementById('results-panel').classList.add('visible');
+}
+function renderRouteSteps() {
+  if (!state.navStops || !state.navLegs) return;
+  const stops = state.navStops, legs = state.navLegs;
+  const navActive = document.getElementById('nav-panel').classList.contains('visible');
   const now = new Date();
   let cumSeconds = 0;
   let html = `<li><div class="step-badge depot">D</div><span class="step-text"><b>Départ</b> — ${stops[0].formatted}</span>
@@ -1007,11 +1011,11 @@ function showResults(stops, legs, distM, durS) {
     const eta = new Date(now.getTime() + cumSeconds * 1000);
     const etaStr = eta.getHours() + 'h' + String(eta.getMinutes()).padStart(2, '0');
     const pn = state.deliveries[i] && state.deliveries[i].placeName ? `<b>${state.deliveries[i].placeName}</b> — ` : '';
-    html += `<li><div class="step-badge">${i+1}</div><span class="step-text">${pn}${stops[i+1].formatted}</span>
+    const stepClass = navActive && i < state.navIndex ? 'step-delivered' : navActive && i === state.navIndex ? 'step-current' : '';
+    html += `<li class="${stepClass}"><div class="step-badge">${i+1}</div><span class="step-text">${pn}${stops[i+1].formatted}</span>
       <span class="step-dist">${legs[i].distance.text} · ${legs[i].duration.text} · ~${etaStr}</span></li>`;
   }
   document.getElementById('route-steps').innerHTML = html;
-  document.getElementById('results-panel').classList.add('visible');
 }
 
 // ── STATUS / RESET / PREFS ──
@@ -1026,7 +1030,7 @@ function startNavigation() {
   state.navIndex = 0; state.followMode = true;
   document.getElementById('btn-nav-start').classList.remove('visible');
   document.getElementById('nav-panel').classList.add('visible');
-  updateNavPanel(); renderDeliveryList(); saveSession();
+  updateNavPanel(); renderDeliveryList(); renderRouteSteps(); saveSession();
   openInGoogleMaps();
   // Wake Lock — écran toujours allumé
   if ('wakeLock' in navigator) navigator.wakeLock.request('screen').then(l => state.wakeLock = l).catch(() => {});
@@ -1090,7 +1094,7 @@ function nextNavStop() {
     exitNavigation(); showStatus('success', 'Tourn\u00e9e termin\u00e9e !');
     localStorage.removeItem('nexum_session'); return;
   }
-  state.navIndex++; state.followMode = true; updateNavPanel(); renderDeliveryList(); saveSession();
+  state.navIndex++; state.followMode = true; updateNavPanel(); renderDeliveryList(); renderRouteSteps(); saveSession();
   openInGoogleMaps();
 }
 function openInGoogleMaps() {
