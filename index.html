@@ -475,7 +475,7 @@
       </div>
 
       <div id="map-preview" onclick="toggleSidebar()"></div>
-      <button id="btn-reset" onclick="resetAll()">Réinitialiser la carte</button>
+      <button id="btn-reset" onclick="resetAll()">Réinitialiser la tournée</button>
       <button id="btn-reset" style="margin-top:4px;background:var(--red-bg);color:var(--red);border:1px solid #5c2a2a;width:100%;padding:8px;font-size:.72rem;border-radius:8px;cursor:pointer" onclick="if(confirm('Effacer toutes les données (cache, session, préférences) et recharger ?')){caches.keys().then(k=>Promise.all(k.map(c=>caches.delete(c))));localStorage.clear();navigator.serviceWorker.getRegistrations().then(r=>r.forEach(s=>s.unregister()));setTimeout(()=>location.reload(true),500)}">Vider le cache &amp; données</button>
     </div>
   </div>
@@ -1107,8 +1107,9 @@ function updateNavPanel() {
 }
 function nextNavStop() {
   if (state.navIndex >= state.deliveries.length - 1) {
-    exitNavigation(); showStatus('success', 'Tourn\u00e9e termin\u00e9e !');
-    localStorage.removeItem('nexum_session'); return;
+    state.navIndex = state.deliveries.length;
+    exitNavigation(); renderRouteSteps(); showStatus('success', 'Tournée terminée ! Vérifiez vos livraisons puis réinitialisez.');
+    saveSession(); return;
   }
   state.navIndex++; state.followMode = true; updateNavPanel(); renderDeliveryList(); renderRouteSteps(); saveSession();
   openInGoogleMaps();
@@ -1143,7 +1144,7 @@ function exitNavigation() {
 }
 
 function resetAll() {
-  if (!confirm('Effacer le trajet, les marqueurs et la liste d\'adresses ?')) return;
+  if (!confirm('Réinitialiser la tournée ? Toutes les adresses et le tracé seront effacés.')) return;
   clearMarkers(); state.directionsRenderer.setDirections({ routes: [] });
   if (state.previewRenderer) state.previewRenderer.setDirections({ routes: [] });
   if (state.startPoint?.marker) { state.startPoint.marker.setMap(null); }
