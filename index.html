@@ -1116,20 +1116,7 @@ function nextNavStop() {
 function openInGoogleMaps() {
   if (!state.navStops || state.navIndex + 1 >= state.navStops.length) return;
   const dest = state.navStops[state.navIndex + 1];
-  const coords = `${dest.lat},${dest.lng}`;
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  const isAndroid = /Android/i.test(navigator.userAgent);
-  let url;
-  if (isAndroid) {
-    url = `google.navigation:q=${coords}&mode=d`;
-  } else if (isIOS) {
-    url = `comgooglemaps://?daddr=${coords}&directionsmode=driving`;
-  } else {
-    url = `https://www.google.com/maps/dir/?api=1&destination=${coords}&travelmode=driving`;
-  }
-  const a = document.createElement('a');
-  a.href = url; a.target = '_blank'; a.rel = 'noopener';
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  window.open(`https://www.google.com/maps/dir/?api=1&destination=${dest.lat},${dest.lng}&travelmode=driving`, '_blank');
 }
 function centerOnMe() {
   state.followMode = true;
