@@ -659,13 +659,6 @@ function setupAutocomplete(inputId) {
       const nameIsAddr = !p.name || p.formatted_address.toLowerCase().includes(p.name.toLowerCase());
       input.dataset.placeName = (isEstablishment && !nameIsAddr) ? p.name : '';
       input.dataset.formatted = p.formatted_address; input.dataset.resolved = 'true';
-      // If no business name found, search for nearby establishment
-      if (!input.dataset.placeName) {
-        const svc = new google.maps.places.PlacesService(state.map);
-        svc.nearbySearch({ location: p.geometry.location, radius: 30, type: 'establishment' }, (results, status) => {
-          if (status === 'OK' && results.length) { input.dataset.placeName = results[0].name; }
-        });
-      }
     }
   });
   input.addEventListener('input', () => { input.dataset.resolved = ''; });
