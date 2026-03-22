@@ -1,7 +1,7 @@
 {
-  "name": "LivreurGPS - Optimiseur de Tournée",
-  "short_name": "LivreurGPS",
-  "description": "Optimiseur de tournée de livraison avec GPS",
+  "name": "Nexum - Planification intelligente de tournées",
+  "short_name": "Nexum",
+  "description": "Planification intelligente de tournées de livraison",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "any",

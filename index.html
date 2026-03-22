@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="LivreurGPS" />
+  <meta name="apple-mobile-web-app-title" content="Nexum" />
   <meta name="theme-color" content="#1a1a2e" />
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icon.svg" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
-  <title>LivreurGPS - Optimiseur de Tournée</title>
+  <title>Nexum - Planification intelligente de tournées</title>
   <style>
     :root {
       --bg: #1a1a2e;
@@ -195,6 +195,10 @@
       margin-top: 3px; outline: none; font-style: italic;
     }
     .delivery-note-input:focus { border-color: var(--accent); }
+    .delivery-leg-info {
+      font-size: .62rem; color: var(--text2); margin-top: 3px;
+      display: flex; gap: 8px; opacity: .75;
+    }
     .drag-handle {
       cursor: grab; color: var(--text2); font-size: .9rem;
       padding: 4px 2px; flex-shrink: 0; user-select: none;
@@ -411,8 +415,8 @@
 
 <div id="sidebar">
   <div class="sidebar-header">
-    <h1>LivreurGPS</h1>
-    <p>Optimiseur de tournée</p>
+    <h1>Nexum</h1>
+    <p>Planification intelligente de tournées</p>
   </div>
   <div class="sidebar-body">
 
@@ -488,7 +492,7 @@
           </div>
         </div>
         <div class="nav-actions">
-          <button id="btn-nav-go" onclick="openInGoogleMaps()">En route</button>
+          <button id="btn-nav-go" onclick="openInGoogleMaps()">&#x1F4CD; Google Maps</button>
           <button id="btn-nav-next" onclick="nextNavStop()">Suivant</button>
         </div>
         <button id="btn-nav-exit" onclick="exitNavigation()">Quitter la navigation</button>
@@ -530,12 +534,12 @@ async function handleApiKey() {
   const key = document.getElementById('api-key-input').value.trim();
   if (!key) return;
   document.getElementById('btn-api-key').disabled = true;
-  try { await loadGoogleMaps(key); localStorage.setItem('livreurGPS_apiKey', key); initApp(); }
+  try { await loadGoogleMaps(key); localStorage.setItem('nexum_apiKey', key); initApp(); }
   catch (e) { alert(e.message); document.getElementById('btn-api-key').disabled = false; }
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const k = localStorage.getItem('livreurGPS_apiKey');
+  const k = localStorage.getItem('nexum_apiKey');
   const dot = document.getElementById('api-dot');
   if (k) {
     document.getElementById('api-key-input').value = k;
@@ -620,17 +624,17 @@ function initApp() {
 function saveSession() {
   const data = {
     startPoint: state.startPoint ? { address: state.startPoint.address, lat: state.startPoint.lat, lng: state.startPoint.lng, formatted: state.startPoint.formatted } : null,
-    deliveries: state.deliveries.map(d => ({ id: d.id, address: d.address, lat: d.lat, lng: d.lng, formatted: d.formatted, note: d.note || '' })),
+    deliveries: state.deliveries.map(d => ({ id: d.id, address: d.address, lat: d.lat, lng: d.lng, formatted: d.formatted, note: d.note || '', legDist: d.legDist || '', legDur: d.legDur || '' })),
     routeOptimized: !!state.navStops,
     navActive: !!document.getElementById('nav-panel').classList.contains('visible'),
     navIndex: state.navIndex,
     idCounter: idCounter,
   };
-  localStorage.setItem('livreurGPS_session', JSON.stringify(data));
+  localStorage.setItem('nexum_session', JSON.stringify(data));
 }
 function restoreSession() {
   try {
-    const data = JSON.parse(localStorage.getItem('livreurGPS_session'));
+    const data = JSON.parse(localStorage.getItem('nexum_session'));
     if (!data || (!data.startPoint && !data.deliveries.length)) return;
     idCounter = data.idCounter || 0;
     // Restore start point
@@ -666,13 +670,13 @@ function restoreSession() {
 }
 
 // ── FREQUENT ADDRESSES ──
-function getFrequentAddresses() { try { return JSON.parse(localStorage.getItem('livreurGPS_freqAddr') || '[]'); } catch { return []; } }
+function getFrequentAddresses() { try { return JSON.parse(localStorage.getItem('nexum_freqAddr') || '[]'); } catch { return []; } }
 function saveFrequentAddress(addr) {
   const list = getFrequentAddresses();
   const ex = list.find(a => a.formatted === addr.formatted);
   if (ex) { ex.count++; ex.lastUsed = Date.now(); } else { list.push({ ...addr, count: 1, lastUsed: Date.now() }); }
   list.sort((a, b) => b.count - a.count);
-  localStorage.setItem('livreurGPS_freqAddr', JSON.stringify(list.slice(0, 50)));
+  localStorage.setItem('nexum_freqAddr', JSON.stringify(list.slice(0, 50)));
 }
 function showFreqDropdown(inputId, dropdownId) {
   const input = document.getElementById(inputId), dd = document.getElementById(dropdownId);
@@ -682,7 +686,7 @@ function showFreqDropdown(inputId, dropdownId) {
   if (!matches.length) { dd.classList.remove('visible'); return; }
   dd.innerHTML = matches.map(a => `
     <div class="freq-item" data-lat="${a.lat}" data-lng="${a.lng}" data-formatted="${a.formatted.replace(/"/g,'&quot;')}" data-address="${a.address.replace(/"/g,'&quot;')}" data-note="${(a.note||'').replace(/"/g,'&quot;')}">
-      <span class="freq-icon">&#9733;</span><span>${a.formatted.length > 50 ? a.formatted.substring(0,47)+'...' : a.formatted}${a.note ? ' <small style="color:var(--yellow)">'+a.note+'</small>' : ''}</span><span class="freq-count">${a.count}x</span>
+      <span class="freq-icon">&#9733;</span><span>${a.formatted.length > 50 ? a.formatted.substring(0,47)+'...' : a.formatted}${a.note ? ' <small style="color:var(--yellow)">'+a.note+'</small>' : ''}</span>
     </div>`).join('');
   dd.classList.add('visible');
   dd.querySelectorAll('.freq-item').forEach(item => {
@@ -714,10 +718,16 @@ function setupAutocomplete(inputId) {
   input.addEventListener('input', () => { input.dataset.resolved = ''; });
 }
 function updateAutocompleteBias() {
-  const pts = []; if (state.startPoint) pts.push(state.startPoint); pts.push(...state.deliveries);
-  if (!pts.length) return;
-  const b = new google.maps.LatLngBounds(); pts.forEach(p => b.extend({ lat: p.lat, lng: p.lng }));
-  ['start-input', 'delivery-input'].forEach(id => { const el = document.getElementById(id); if (el._autocomplete) el._autocomplete.setBounds(b); });
+  if (!state.startPoint) return;
+  const center = { lat: state.startPoint.lat, lng: state.startPoint.lng };
+  // ~30km radius around start point
+  const offset = 0.27;
+  const b = new google.maps.LatLngBounds(
+    { lat: center.lat - offset, lng: center.lng - offset },
+    { lat: center.lat + offset, lng: center.lng + offset }
+  );
+  const el = document.getElementById('delivery-input');
+  if (el._autocomplete) { el._autocomplete.setBounds(b); el._autocomplete.setOptions({ strictBounds: true }); }
 }
 
 // ── GEOCODING ──
@@ -770,13 +780,14 @@ function renderDeliveryList() {
     const name = d.formatted.length > 50 ? d.formatted.substring(0, 47) + '...' : d.formatted;
     const noteDisplay = d.note ? `<div class="delivery-note" onclick="editNote(${d.id})" title="Cliquer pour modifier">${d.note}</div>` : '';
     const inputStyle = d.note ? 'display:none' : '';
+    const legInfo = d.legDist && d.legDur ? `<div class="delivery-leg-info"><span>${d.legDist}</span><span>·</span><span>${d.legDur}</span></div>` : '';
     const liClass = navActive && i < state.navIndex ? 'delivered' : navActive && i === state.navIndex ? 'nav-current-stop' : '';
     return `<li data-idx="${i}" data-id="${d.id}" class="${liClass}">
       <div class="drag-handle">&#8942;&#8942;</div>
       <div class="delivery-num">${i + 1}</div>
       <div class="delivery-addr">${name}${noteDisplay}
         <input class="delivery-note-input" style="${inputStyle}" placeholder="Note (code, étage...)" value=""
-          onblur="saveNote(${d.id}, this.value)" data-id="${d.id}" />
+          onblur="saveNote(${d.id}, this.value)" data-id="${d.id}" />${legInfo}
       </div>
       <button class="btn-del" onclick="removeDelivery(${d.id})">&#10005;</button>
     </li>`;
@@ -799,15 +810,20 @@ function editNote(id) {
 function saveNoteToFrequent(formatted, note) {
   const list = getFrequentAddresses();
   const ex = list.find(a => a.formatted === formatted);
-  if (ex) { ex.note = note; localStorage.setItem('livreurGPS_freqAddr', JSON.stringify(list)); }
+  if (ex) { ex.note = note; localStorage.setItem('nexum_freqAddr', JSON.stringify(list)); }
 }
 function removeDelivery(id) {
   const idx = state.deliveries.findIndex(d => d.id === id); if (idx === -1) return;
   if (state.deliveries[idx].marker) state.deliveries[idx].marker.setMap(null);
-  state.deliveries.splice(idx, 1); renderDeliveryList();
+  state.deliveries.splice(idx, 1);
+  clearMarkers();
   state.directionsRenderer.setDirections({ routes: [] });
   if (state.previewRenderer) state.previewRenderer.setDirections({ routes: [] });
+  state.navStops = null; state.navLegs = null;
+  state.deliveries.forEach(d => { d.legDist = ''; d.legDur = ''; });
   document.getElementById('results-panel').classList.remove('visible');
+  document.getElementById('btn-nav-start').classList.remove('visible');
+  renderDeliveryList();
   saveSession();
 }
 
@@ -1015,7 +1031,11 @@ function displayRoute(stops) {
     const legs = result.routes[0].legs; let td = 0, tt = 0;
     legs.forEach(l => { td += l.distance.value; tt += l.duration.value; });
     state.navStops = stops; state.navLegs = legs;
+    state.deliveries.forEach((d, i) => {
+      if (legs[i]) { d.legDist = legs[i].distance.text; d.legDur = legs[i].duration.text; }
+    });
     showResults(stops, legs, td, tt); showStatus('success', `${state.deliveries.length} livraison(s) optimisée(s).`);
+    renderDeliveryList();
     document.getElementById('btn-nav-start').classList.add('visible');
     document.getElementById('nav-panel').classList.remove('visible');
     saveSession(); setUIBusy(false);
@@ -1057,6 +1077,7 @@ function startNavigation() {
   document.getElementById('btn-nav-start').classList.remove('visible');
   document.getElementById('nav-panel').classList.add('visible');
   updateNavPanel(); renderDeliveryList(); saveSession();
+  openInGoogleMaps();
   // Wake Lock — écran toujours allumé
   if ('wakeLock' in navigator) navigator.wakeLock.request('screen').then(l => state.wakeLock = l).catch(() => {});
   state.watchId = navigator.geolocation.watchPosition(
@@ -1117,13 +1138,25 @@ function updateNavPanel() {
 function nextNavStop() {
   if (state.navIndex >= state.deliveries.length - 1) {
     exitNavigation(); showStatus('success', 'Tourn\u00e9e termin\u00e9e !');
-    localStorage.removeItem('livreurGPS_session'); return;
+    localStorage.removeItem('nexum_session'); return;
   }
   state.navIndex++; state.followMode = true; updateNavPanel(); renderDeliveryList(); saveSession();
+  openInGoogleMaps();
 }
 function openInGoogleMaps() {
   const dest = state.navStops[state.navIndex + 1];
-  window.open(`https://www.google.com/maps/dir/?api=1&destination=${dest.lat},${dest.lng}&travelmode=driving`, '_blank');
+  const coords = `${dest.lat},${dest.lng}`;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  if (isAndroid) {
+    window.location.href = `google.navigation:q=${coords}&mode=d`;
+  } else if (isIOS) {
+    const t0 = Date.now();
+    window.location.href = `comgooglemaps://?daddr=${coords}&directionsmode=driving`;
+    setTimeout(() => { if (Date.now() - t0 < 1800) window.location.href = `maps://maps.apple.com/?daddr=${coords}&dirflg=d`; }, 1000);
+  } else {
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${coords}&travelmode=driving`, '_blank');
+  }
 }
 function centerOnMe() {
   state.followMode = true;
@@ -1160,21 +1193,31 @@ function resetAll() {
   document.getElementById('nav-panel').classList.remove('visible');
   document.getElementById('btn-nav-start').classList.remove('visible');
   document.getElementById('status-bar').className = '';
-  localStorage.removeItem('livreurGPS_session');
+  localStorage.removeItem('nexum_session');
 }
 function saveMapPrefs() {
-  localStorage.setItem('livreurGPS_mapPrefs', JSON.stringify({
+  localStorage.setItem('nexum_mapPrefs', JSON.stringify({
     mapTypeId: state.map.getMapTypeId(), zoom: state.map.getZoom(),
     center: { lat: state.map.getCenter().lat(), lng: state.map.getCenter().lng() },
     tilt: state.map.getTilt(), heading: state.map.getHeading(),
   }));
 }
 function restoreMapPrefs() {
-  try { const p = JSON.parse(localStorage.getItem('livreurGPS_mapPrefs'));
-    if (p.mapTypeId) state.map.setMapTypeId(p.mapTypeId); if (p.zoom) state.map.setZoom(p.zoom);
-    if (p.center) state.map.setCenter(p.center); if (p.tilt != null) state.map.setTilt(p.tilt);
-    if (p.heading != null) state.map.setHeading(p.heading);
+  try { const p = JSON.parse(localStorage.getItem('nexum_mapPrefs'));
+    if (p && p.center) {
+      if (p.mapTypeId) state.map.setMapTypeId(p.mapTypeId); if (p.zoom) state.map.setZoom(p.zoom);
+      state.map.setCenter(p.center); if (p.tilt != null) state.map.setTilt(p.tilt);
+      if (p.heading != null) state.map.setHeading(p.heading);
+      return;
+    }
   } catch {}
+  // No saved prefs — center on user's current position
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(pos => {
+      state.map.setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+      state.map.setZoom(13);
+    }, () => {}, { enableHighAccuracy: false, timeout: 5000 });
+  }
 }
 function setUIBusy(b) { ['btn-set-start','btn-add','btn-optimize','btn-reset','btn-nav-start'].forEach(id => { const e = document.getElementById(id); if (e) e.disabled = b; }); }
 // ── MOBILE TOGGLE ──
