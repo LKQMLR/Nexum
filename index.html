@@ -712,13 +712,23 @@ function setupFreqDropdown(inputId, dropdownId) {
 // ── AUTOCOMPLETE ──
 function setupAutocomplete(inputId) {
   const input = document.getElementById(inputId);
-  const ac = new google.maps.places.Autocomplete(input, { componentRestrictions: { country: 'fr' }, fields: ['formatted_address', 'geometry', 'name'] });
+  const ac = new google.maps.places.Autocomplete(input, { componentRestrictions: { country: 'fr' }, fields: ['formatted_address', 'geometry', 'name', 'types'] });
   input._autocomplete = ac;
   ac.addListener('place_changed', () => {
     const p = ac.getPlace();
     if (p.geometry) { input.dataset.lat = p.geometry.location.lat(); input.dataset.lng = p.geometry.location.lng();
-      input.dataset.placeName = (p.name && p.name !== p.formatted_address) ? p.name : '';
-      input.dataset.formatted = p.formatted_address; input.dataset.resolved = 'true'; }
+      const isEstablishment = p.types && p.types.some(t => ['establishment','point_of_interest','store','food','restaurant','cafe','shopping_mall','supermarket','locality'].includes(t));
+      const nameIsAddr = !p.name || p.formatted_address.toLowerCase().includes(p.name.toLowerCase());
+      input.dataset.placeName = (isEstablishment && !nameIsAddr) ? p.name : '';
+      input.dataset.formatted = p.formatted_address; input.dataset.resolved = 'true';
+      // If no business name found, search for nearby establishment
+      if (!input.dataset.placeName) {
+        const svc = new google.maps.places.PlacesService(state.map);
+        svc.nearbySearch({ location: p.geometry.location, radius: 30, type: 'establishment' }, (results, status) => {
+          if (status === 'OK' && results.length) { input.dataset.placeName = results[0].name; }
+        });
+      }
+    }
   });
   input.addEventListener('input', () => { input.dataset.resolved = ''; });
 }
