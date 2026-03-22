@@ -1,4 +1,4 @@
-const CACHE = 'livreurgps-v15';
+const CACHE = 'livreurgps-v16';
 const ASSETS = ['./index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
