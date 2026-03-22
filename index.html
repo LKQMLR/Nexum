@@ -178,9 +178,9 @@
     .delivery-note::before { content: '\00AB\00A0'; }
     .delivery-note::after { content: '\00A0\00BB'; }
     .delivery-note-input {
-      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      width: 48ch; max-width: 100%; background: var(--surface2); border: 1px solid var(--border);
       border-radius: 4px; color: var(--text); font-size: .7rem; padding: 4px 8px;
-      margin-top: 3px; outline: none; font-style: italic;
+      margin-top: 3px; outline: none; font-style: italic; box-sizing: border-box;
     }
     .delivery-note-input:focus { border-color: var(--accent); }
     .delivery-leg-info {
