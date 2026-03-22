@@ -1115,14 +1115,15 @@ function nextNavStop() {
   openInGoogleMaps();
 }
 function openInGoogleMaps() {
+  if (!state.navStops || state.navIndex + 1 >= state.navStops.length) return;
   const dest = state.navStops[state.navIndex + 1];
   const coords = `${dest.lat},${dest.lng}`;
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   const isAndroid = /Android/i.test(navigator.userAgent);
   if (isAndroid) {
-    window.location.href = `google.navigation:q=${coords}&mode=d`;
+    window.open(`google.navigation:q=${coords}&mode=d`, '_self');
   } else if (isIOS) {
-    window.location.href = `comgooglemaps://?daddr=${coords}&directionsmode=driving`;
+    window.open(`comgooglemaps://?daddr=${coords}&directionsmode=driving`, '_self');
   } else {
     window.open(`https://www.google.com/maps/dir/?api=1&destination=${coords}&travelmode=driving`, '_blank');
   }
