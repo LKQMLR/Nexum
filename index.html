@@ -109,6 +109,15 @@
       font-size: .7rem; flex-shrink: 0;
     }
     .btn-del:hover { background: var(--red-bg); }
+    .btn-lock {
+      background: transparent; color: var(--text2); border: 1px solid var(--border);
+      padding: 0; width: 24px; height: 24px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .72rem; flex-shrink: 0; cursor: pointer; transition: all .15s;
+    }
+    .btn-lock:hover { border-color: var(--yellow); color: var(--yellow); }
+    .btn-lock.locked { background: rgba(255,200,50,.12); border-color: var(--yellow); color: var(--yellow); }
+    #delivery-list li.delivery-locked { border-color: var(--yellow); box-shadow: 0 0 8px rgba(255,200,50,.15); }
 
     /* ── START DISPLAY ── */
     #start-display {
@@ -586,7 +595,7 @@ function initApp() {
 function saveSession() {
   const data = {
     startPoint: state.startPoint ? { address: state.startPoint.address, lat: state.startPoint.lat, lng: state.startPoint.lng, formatted: state.startPoint.formatted } : null,
-    deliveries: state.deliveries.map(d => ({ id: d.id, address: d.address, lat: d.lat, lng: d.lng, formatted: d.formatted, placeName: d.placeName || '', note: d.note || '', legDist: d.legDist || '', legDur: d.legDur || '' })),
+    deliveries: state.deliveries.map(d => ({ id: d.id, address: d.address, lat: d.lat, lng: d.lng, formatted: d.formatted, placeName: d.placeName || '', note: d.note || '', legDist: d.legDist || '', legDur: d.legDur || '', locked: d.locked || false })),
     routeOptimized: !!state.navStops,
     navActive: !!document.getElementById('nav-panel').classList.contains('visible'),
     navIndex: state.navIndex,
@@ -747,13 +756,17 @@ function renderDeliveryList() {
     const noteDisplay = d.note ? `<div class="delivery-note" onclick="editNote(${d.id})" title="Cliquer pour modifier">${d.note}</div>` : '';
     const inputStyle = d.note ? 'display:none' : '';
     const legInfo = d.legDist && d.legDur ? `<div class="delivery-leg-info"><span>${d.legDist}</span><span>·</span><span>${d.legDur}</span></div>` : '';
-    return `<li data-idx="${i}" data-id="${d.id}">
+    const lockClass = d.locked ? 'btn-lock locked' : 'btn-lock';
+    const lockIcon = d.locked ? '&#128274;' : '&#128275;';
+    const liClass = d.locked ? 'delivery-locked' : '';
+    return `<li data-idx="${i}" data-id="${d.id}" class="${liClass}">
       <div class="drag-handle">&#8942;&#8942;</div>
       <div class="delivery-num">${i + 1}</div>
       <div class="delivery-addr">${placeLabel}${addr}${noteDisplay}
         <input class="delivery-note-input" style="${inputStyle}" placeholder="Note (code, étage...)" value="" maxlength="44"
           onblur="saveNote(${d.id}, this.value)" data-id="${d.id}" />${legInfo}
       </div>
+      <button class="${lockClass}" onclick="toggleLock(${d.id})" title="Verrouiller la position">${lockIcon}</button>
       <button class="btn-del" onclick="removeDelivery(${d.id})">&#10005;</button>
     </li>`;
   }).join('');
@@ -776,6 +789,11 @@ function saveNoteToFrequent(formatted, note) {
   const list = getFrequentAddresses();
   const ex = list.find(a => a.formatted === formatted);
   if (ex) { ex.note = note; localStorage.setItem('nexum_freqAddr', JSON.stringify(list)); }
+}
+function toggleLock(id) {
+  const d = state.deliveries.find(d => d.id === id); if (!d) return;
+  d.locked = !d.locked;
+  renderDeliveryList(); saveSession();
 }
 function removeDelivery(id) {
   const idx = state.deliveries.findIndex(d => d.id === id); if (idx === -1) return;
@@ -852,9 +870,67 @@ async function optimizeRoute() {
   if (!state.deliveries.length) return showStatus('error', 'Ajoutez au moins une adresse.');
   setUIBusy(true); showStatus('loading', 'Optimisation...'); document.getElementById('results-panel').classList.remove('visible');
   if (state.deliveries.length === 1) { displayRoute([state.startPoint, state.deliveries[0]]); return; }
-  const all = [state.startPoint, ...state.deliveries];
-  const tour = nearestNeighborTSP(buildDistanceMatrix(all), 0);
-  state.deliveries = tour.slice(1).map(i => all[i]);
+
+  const hasLocked = state.deliveries.some(d => d.locked);
+  if (!hasLocked) {
+    // No locks — optimize everything
+    const all = [state.startPoint, ...state.deliveries];
+    const tour = nearestNeighborTSP(buildDistanceMatrix(all), 0);
+    state.deliveries = tour.slice(1).map(i => all[i]);
+  } else {
+    // Optimize unlocked deliveries around locked positions
+    const result = new Array(state.deliveries.length);
+    const lockedPositions = [];
+    const unlocked = [];
+    state.deliveries.forEach((d, i) => {
+      if (d.locked) { result[i] = d; lockedPositions.push(i); }
+      else unlocked.push(d);
+    });
+    if (unlocked.length > 0) {
+      // Build segments between locked positions
+      // Anchors: start point, then each locked delivery, define segments of free slots
+      const anchors = [-1, ...lockedPositions, state.deliveries.length];
+      const freeSlots = [];
+      for (let a = 0; a < anchors.length - 1; a++) {
+        const slots = [];
+        for (let s = anchors[a] + 1; s < anchors[a + 1]; s++) {
+          if (!result[s]) slots.push(s);
+        }
+        if (slots.length) {
+          const anchorStart = anchors[a] === -1 ? state.startPoint : state.deliveries[anchors[a]];
+          const anchorEnd = anchors[a + 1] >= state.deliveries.length ? null : state.deliveries[anchors[a + 1]];
+          freeSlots.push({ slots, anchorStart, anchorEnd });
+        }
+      }
+      // Distribute unlocked to nearest segment, then optimize within each segment
+      let remaining = [...unlocked];
+      freeSlots.forEach(seg => {
+        // Pick the closest unlocked deliveries for this segment's slots
+        const needed = seg.slots.length;
+        const segCenter = seg.anchorStart;
+        remaining.sort((a, b) => {
+          const da = Math.abs(a.lat - segCenter.lat) + Math.abs(a.lng - segCenter.lng);
+          const db = Math.abs(b.lat - segCenter.lat) + Math.abs(b.lng - segCenter.lng);
+          return da - db;
+        });
+        const segDeliveries = remaining.splice(0, needed);
+        if (segDeliveries.length > 1) {
+          const segAll = [seg.anchorStart, ...segDeliveries];
+          const tour = nearestNeighborTSP(buildDistanceMatrix(segAll), 0);
+          const optimized = tour.slice(1).map(i => segAll[i]);
+          seg.slots.forEach((slot, idx) => { result[slot] = optimized[idx]; });
+        } else if (segDeliveries.length === 1) {
+          result[seg.slots[0]] = segDeliveries[0];
+        }
+      });
+      // Any remaining unlocked (shouldn't happen, but safety)
+      remaining.forEach(d => {
+        const emptyIdx = result.findIndex(r => !r);
+        if (emptyIdx !== -1) result[emptyIdx] = d;
+      });
+    }
+    state.deliveries = result;
+  }
   renderDeliveryList(); displayRoute([state.startPoint, ...state.deliveries]); saveSession();
 }
 function traceCustomRoute() {
