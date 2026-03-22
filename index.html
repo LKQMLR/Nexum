@@ -547,6 +547,56 @@ function initApp() {
   state.map.addListener('idle', saveMapPrefs);
   state.map.addListener('tilt_changed', saveMapPrefs);
   state.map.addListener('heading_changed', saveMapPrefs);
+  restoreSession();
+}
+
+// ── SESSION PERSISTENCE ──
+function saveSession() {
+  const data = {
+    startPoint: state.startPoint ? { address: state.startPoint.address, lat: state.startPoint.lat, lng: state.startPoint.lng, formatted: state.startPoint.formatted } : null,
+    deliveries: state.deliveries.map(d => ({ id: d.id, address: d.address, lat: d.lat, lng: d.lng, formatted: d.formatted, note: d.note || '' })),
+    routeOptimized: !!state.navStops,
+    navActive: !!document.getElementById('nav-panel').classList.contains('visible'),
+    navIndex: state.navIndex,
+    idCounter: idCounter,
+  };
+  localStorage.setItem('livreurGPS_session', JSON.stringify(data));
+}
+function restoreSession() {
+  try {
+    const data = JSON.parse(localStorage.getItem('livreurGPS_session'));
+    if (!data || (!data.startPoint && !data.deliveries.length)) return;
+    idCounter = data.idCounter || 0;
+    // Restore start point
+    if (data.startPoint) {
+      const s = data.startPoint;
+      const marker = createClassicMarker({ lat: s.lat, lng: s.lng }, 'D', '#22c55e', 'Départ');
+      state.startPoint = { ...s, marker };
+      const d = document.getElementById('start-display'); d.textContent = s.formatted; d.classList.add('visible');
+      document.getElementById('start-input').value = s.address;
+    }
+    // Restore deliveries
+    if (data.deliveries.length) {
+      data.deliveries.forEach(d => {
+        const marker = createClassicMarker({ lat: d.lat, lng: d.lng }, String(state.deliveries.length + 1), '#ef4444', d.formatted);
+        state.deliveries.push({ ...d, marker });
+      });
+      renderDeliveryList();
+    }
+    // Restore route
+    if (data.routeOptimized && state.startPoint && state.deliveries.length) {
+      displayRoute([state.startPoint, ...state.deliveries]);
+      // Restore navigation
+      if (data.navActive && data.navIndex >= 0) {
+        setTimeout(() => {
+          state.navIndex = data.navIndex;
+          document.getElementById('btn-nav-start').classList.remove('visible');
+          document.getElementById('nav-panel').classList.add('visible');
+          updateNavPanel();
+        }, 1000);
+      }
+    }
+  } catch {}
 }
 
 // ── FREQUENT ADDRESSES ──
@@ -668,7 +718,7 @@ function renderDeliveryList() {
 }
 function saveNote(id, note) {
   const d = state.deliveries.find(d => d.id === id);
-  if (d) { d.note = note.trim(); saveNoteToFrequent(d.formatted, d.note); }
+  if (d) { d.note = note.trim(); saveNoteToFrequent(d.formatted, d.note); saveSession(); }
 }
 function saveNoteToFrequent(formatted, note) {
   const list = getFrequentAddresses();
@@ -682,6 +732,7 @@ function removeDelivery(id) {
   state.directionsRenderer.setDirections({ routes: [] });
   if (state.previewRenderer) state.previewRenderer.setDirections({ routes: [] });
   document.getElementById('results-panel').classList.remove('visible');
+  saveSession();
 }
 
 // ── HANDLERS ──
@@ -696,7 +747,7 @@ async function handleSetStart() {
     state.map.panTo({ lat: geo.lat, lng: geo.lng }); state.map.setZoom(14);
     const d = document.getElementById('start-display'); d.textContent = geo.formatted; d.classList.add('visible');
     saveFrequentAddress({ address: addr, lat: geo.lat, lng: geo.lng, formatted: geo.formatted });
-    updateAutocompleteBias(); showStatus('success', 'Départ défini.');
+    updateAutocompleteBias(); showStatus('success', 'Départ défini.'); saveSession();
   } catch (e) { showStatus('error', e.message); } finally { setUIBusy(false); }
 }
 async function handleAddDelivery() {
@@ -710,7 +761,7 @@ async function handleAddDelivery() {
     state.map.panTo({ lat: geo.lat, lng: geo.lng }); state.map.setZoom(14);
     renderDeliveryList(); saveFrequentAddress({ address: addr, lat: geo.lat, lng: geo.lng, formatted: geo.formatted });
     updateAutocompleteBias(); input.value = ''; input.dataset.resolved = '';
-    showStatus('success', `${state.deliveries.length} adresse(s) ajoutée(s).`);
+    showStatus('success', `${state.deliveries.length} adresse(s) ajoutée(s).`); saveSession();
   } catch (e) { showStatus('error', e.message); } finally { setUIBusy(false); }
 }
 
@@ -743,7 +794,7 @@ async function optimizeRoute() {
   const all = [state.startPoint, ...state.deliveries];
   const tour = nearestNeighborTSP(buildDistanceMatrix(all), 0);
   state.deliveries = tour.slice(1).map(i => all[i]);
-  renderDeliveryList(); displayRoute([state.startPoint, ...state.deliveries]);
+  renderDeliveryList(); displayRoute([state.startPoint, ...state.deliveries]); saveSession();
 }
 
 // ── MOVE / DRAG ──
@@ -752,6 +803,7 @@ function moveToPosition(from, to) {
   state.deliveries.splice(to, 0, state.deliveries.splice(from, 1)[0]);
   renderDeliveryList();
   if (state.startPoint && state.deliveries.length) displayRoute([state.startPoint, ...state.deliveries]);
+  saveSession();
 }
 
 function initDragAndDrop() {
@@ -890,7 +942,7 @@ function displayRoute(stops) {
     showResults(stops, legs, td, tt); showStatus('success', `${state.deliveries.length} livraison(s) optimisée(s).`);
     document.getElementById('btn-nav-start').classList.add('visible');
     document.getElementById('nav-panel').classList.remove('visible');
-    setUIBusy(false);
+    saveSession(); setUIBusy(false);
   });
 }
 
@@ -922,7 +974,7 @@ function startNavigation() {
   state.navIndex = 0; state.followMode = true;
   document.getElementById('btn-nav-start').classList.remove('visible');
   document.getElementById('nav-panel').classList.add('visible');
-  updateNavPanel();
+  updateNavPanel(); saveSession();
   // Wake Lock — écran toujours allumé
   if ('wakeLock' in navigator) navigator.wakeLock.request('screen').then(l => state.wakeLock = l).catch(() => {});
   state.watchId = navigator.geolocation.watchPosition(
@@ -984,7 +1036,7 @@ function nextNavStop() {
   if (state.navIndex >= state.deliveries.length - 1) {
     exitNavigation(); showStatus('success', 'Tourn\u00e9e termin\u00e9e !'); return;
   }
-  state.navIndex++; state.followMode = true; updateNavPanel();
+  state.navIndex++; state.followMode = true; updateNavPanel(); saveSession();
 }
 function openInGoogleMaps() {
   const dest = state.navStops[state.navIndex + 1];
@@ -1003,6 +1055,7 @@ function exitNavigation() {
   document.getElementById('nav-panel').classList.remove('visible');
   document.getElementById('btn-nav-start').classList.add('visible');
   state.markers.forEach(m => m.setAnimation(null));
+  saveSession();
 }
 
 function resetAll() {
@@ -1024,6 +1077,7 @@ function resetAll() {
   document.getElementById('nav-panel').classList.remove('visible');
   document.getElementById('btn-nav-start').classList.remove('visible');
   document.getElementById('status-bar').className = '';
+  localStorage.removeItem('livreurGPS_session');
 }
 function saveMapPrefs() {
   localStorage.setItem('livreurGPS_mapPrefs', JSON.stringify({
