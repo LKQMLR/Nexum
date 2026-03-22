@@ -1097,8 +1097,8 @@ function initSwipeToDelete() {
       rawDx = dx;
       if (rawDx > 0) rawDx = 0;
       const absDx = Math.abs(rawDx);
-      const tx = absDx < 10 ? absDx : 10 + Math.log(1 + (absDx - 10) * 0.08) * 40;
-      li.style.transform = `translateX(${-tx}px)`;
+      const tx = Math.round(absDx < 10 ? absDx : 10 + Math.log(1 + (absDx - 10) * 0.08) * 40);
+      li.style.transform = `translate3d(${-tx}px,0,0)`;
       li.style.opacity = Math.max(0.3, 1 - absDx / 400);
     }, { passive: false });
     li.addEventListener('touchend', () => {
