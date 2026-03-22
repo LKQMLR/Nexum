@@ -225,9 +225,12 @@
     /* ── OPTIMIZE BUTTON ── */
     #btn-optimize {
       background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #fff; width: 100%; padding: 12px; font-size: .9rem;
-      border-radius: var(--radius); letter-spacing: .2px;
+      color: #fff; width: 100%; padding: 14px; font-size: .95rem; font-weight: 700;
+      border-radius: var(--radius); letter-spacing: .3px;
+      box-shadow: 0 4px 16px rgba(79,140,255,.4);
+      text-transform: uppercase;
     }
+    #btn-optimize:not(:disabled):hover { box-shadow: 0 6px 24px rgba(79,140,255,.5); }
     #btn-trace {
       background: var(--surface2); border: 1px solid #7c3aed;
       color: #a78bfa; width: 100%; padding: 10px; font-size: .82rem;
