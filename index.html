@@ -547,7 +547,8 @@ function initApp() {
 
   state.map = new google.maps.Map(document.getElementById('map'), {
     center: { lat: 46.603354, lng: 1.888334 }, zoom: 6,
-    mapTypeControl: true, streetViewControl: true, fullscreenControl: true, zoomControl: true,
+    mapTypeControl: true, mapTypeControlOptions: { style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR, position: google.maps.ControlPosition.TOP_LEFT },
+    streetViewControl: false, fullscreenControl: false, zoomControl: true,
   });
   state.geocoder = new google.maps.Geocoder();
   state.directionsService = new google.maps.DirectionsService();
