@@ -1080,20 +1080,20 @@ function initSwipeToDelete() {
       rawDx = e.touches[0].clientX - startX;
       if (rawDx > 0) rawDx = 0;
       const absDx = Math.abs(rawDx);
-      const resist = absDx < 80 ? absDx : 80 + (absDx - 80) * 0.3;
-      li.style.transform = `translateX(${-resist}px)`;
+      // Logarithmic resistance — heavy drag feel
+      const tx = absDx < 10 ? absDx : 10 + Math.log(1 + (absDx - 10) * 0.08) * 40;
+      li.style.transform = `translateX(${-tx}px)`;
+      li.style.opacity = Math.max(0.3, 1 - absDx / 400);
     }, { passive: true });
     li.addEventListener('touchend', () => {
       if (!swiping) return; swiping = false;
-      const absDx = Math.abs(rawDx);
-      if (absDx > 120) {
+      if (Math.abs(rawDx) > 140) {
         li.classList.add('swiping', 'swipe-out');
         const id = parseInt(li.dataset.id);
         setTimeout(() => removeDelivery(id), 250);
       } else {
         li.classList.add('swiping');
-        li.style.transform = '';
-        if (bg) bg.style.width = '0';
+        li.style.transform = ''; li.style.opacity = '';
         setTimeout(() => li.classList.remove('swiping'), 200);
       }
     });
