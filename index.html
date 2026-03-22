@@ -560,8 +560,11 @@ function toggleApiKey() {
 function initApp() {
   const ks = document.getElementById('api-key-section');
   ks.style.background = 'var(--green-bg)'; ks.style.borderColor = '#1a4a2a';
-  document.getElementById('api-dot').classList.add('on');
+  const dot = document.getElementById('api-dot');
+  dot.classList.remove('off'); dot.classList.add('on');
   document.getElementById('api-status-text').textContent = 'API connectée';
+  document.getElementById('api-key-body').classList.remove('visible');
+  document.getElementById('api-key-toggle').classList.remove('open');
   document.getElementById('app-sections').classList.add('visible');
 
   state.map = new google.maps.Map(document.getElementById('map'), {
