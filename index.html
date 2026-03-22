@@ -1029,10 +1029,16 @@ function showResults(stops, legs, distM, durS) {
     <div class="summary-card"><span>Distance</span><strong>${km} km</strong></div>
     <div class="summary-card"><span>Durée</span><strong>${h > 0 ? h+'h '+m+'min' : m+' min'}</strong></div>
     <div class="summary-card"><span>Arrêts</span><strong>${state.deliveries.length}</strong></div>`;
-  let html = `<li><div class="step-badge depot">D</div><span class="step-text"><b>Départ</b> — ${stops[0].formatted}</span></li>`;
+  const now = new Date();
+  let cumSeconds = 0;
+  let html = `<li><div class="step-badge depot">D</div><span class="step-text"><b>Départ</b> — ${stops[0].formatted}</span>
+    <span class="step-dist">${now.getHours()}h${String(now.getMinutes()).padStart(2,'0')}</span></li>`;
   for (let i = 0; i < legs.length; i++) {
+    cumSeconds += legs[i].duration.value;
+    const eta = new Date(now.getTime() + cumSeconds * 1000);
+    const etaStr = eta.getHours() + 'h' + String(eta.getMinutes()).padStart(2, '0');
     html += `<li><div class="step-badge">${i+1}</div><span class="step-text">${stops[i+1].formatted}</span>
-      <span class="step-dist">${legs[i].distance.text} · ${legs[i].duration.text}</span></li>`;
+      <span class="step-dist">${legs[i].distance.text} · ${legs[i].duration.text} · ~${etaStr}</span></li>`;
   }
   document.getElementById('route-steps').innerHTML = html;
   document.getElementById('results-panel').classList.add('visible');
