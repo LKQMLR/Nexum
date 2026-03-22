@@ -1013,9 +1013,8 @@ function renderRouteSteps() {
   const now = new Date();
   let cumSeconds = 0;
   let html = `<li><div class="step-badge depot">D</div><div class="step-content">
-    <div class="step-addr"><b>Départ</b></div>
-    <div class="step-meta"><span>${stops[0].formatted}</span></div>
-    <div class="step-meta"><span>${now.getHours()}h${String(now.getMinutes()).padStart(2,'0')}</span></div>
+    <div class="step-place-name" style="color:var(--green)">Départ</div>
+    <div class="step-addr">${stops[0].formatted}</div>
   </div></li>`;
   for (let i = 0; i < legs.length; i++) {
     cumSeconds += legs[i].duration.value;
