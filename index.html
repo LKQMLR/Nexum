@@ -1133,7 +1133,7 @@ function startNavigation() {
   state.navIndex = 0; state.followMode = true;
   document.getElementById('btn-nav-start').classList.remove('visible');
   document.getElementById('nav-panel').classList.add('visible');
-  updateNavPanel(); renderDeliveryList(); renderRouteSteps(); saveSession();
+  updateNavPanel(); renderDeliveryList(); renderRouteSteps(); updateRouteProgress(); saveSession();
   openInGoogleMaps();
   // Wake Lock — écran toujours allumé
   requestWakeLock();
@@ -1196,10 +1196,11 @@ function nextNavStop() {
   if (state.navIndex >= state.deliveries.length - 1) {
     state.navIndex = state.deliveries.length;
     state._tourComplete = true;
+    updateRouteProgress();
     exitNavigation(); renderRouteSteps(); showStatus('success', 'Tournée terminée ! Vérifiez vos livraisons puis réinitialisez.');
     saveSession(); return;
   }
-  state.navIndex++; state.followMode = true; updateNavPanel(); renderDeliveryList(); renderRouteSteps(); saveSession();
+  state.navIndex++; state.followMode = true; updateNavPanel(); renderDeliveryList(); renderRouteSteps(); updateRouteProgress(); saveSession();
   openInGoogleMaps();
 }
 function openInGoogleMaps() {
@@ -1216,6 +1217,44 @@ document.addEventListener('visibilitychange', () => {
 function centerOnMe() {
   state.followMode = true;
   if (state.posMarker) { state.map.panTo(state.posMarker.getPosition()); state.map.setZoom(Math.max(state.map.getZoom(), 16)); }
+}
+function updateRouteProgress() {
+  if (!state.navStops || !state.navLegs) return;
+  // Update markers: delivered = green ✓, current = bounce, upcoming = blue
+  state.markers.forEach((m, idx) => {
+    if (idx === 0) return; // skip start marker
+    if (idx <= state.navIndex) {
+      // Delivered marker → green with ✓
+      const pos = m.getPosition();
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="38" height="48" viewBox="0 0 38 48">
+        <path d="M19 46 C19 46 2 28 2 17 A17 17 0 1 1 36 17 C36 28 19 46 19 46Z" fill="rgba(0,0,0,.25)" transform="translate(1,1)"/>
+        <path d="M19 46 C19 46 2 28 2 17 A17 17 0 1 1 36 17 C36 28 19 46 19 46Z" fill="#22c55e"/>
+        <circle cx="19" cy="17" r="11" fill="rgba(255,255,255,.92)"/>
+        <text x="19" y="22" text-anchor="middle" fill="#22c55e" font-family="Arial,sans-serif" font-weight="800" font-size="14">✓</text></svg>`;
+      m.setIcon({ url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
+        scaledSize: new google.maps.Size(38, 48), anchor: new google.maps.Point(19, 48) });
+    }
+  });
+  // Draw completed legs in green
+  if (state._completedPoly) state._completedPoly.setMap(null);
+  if (state.navIndex > 0) {
+    const completedPath = [];
+    for (let i = 0; i < state.navIndex; i++) {
+      if (state.navLegs[i] && state.navLegs[i].steps) {
+        state.navLegs[i].steps.forEach(step => {
+          step.path.forEach(p => completedPath.push(p));
+        });
+      }
+    }
+    if (completedPath.length) {
+      state._completedPoly = new google.maps.Polyline({
+        path: completedPath, map: state.map,
+        strokeColor: '#22c55e', strokeWeight: 6, strokeOpacity: 0.9,
+        zIndex: 10,
+        icons: [{ icon: { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW, scale: 2.5, strokeColor: '#fff', strokeWeight: 1, fillColor: '#fff', fillOpacity: 0.9 }, offset: '0', repeat: '80px' }]
+      });
+    }
+  }
 }
 function exitNavigation() {
   clearTimeout(state._recenterTimer);
@@ -1237,6 +1276,7 @@ function resetAll() {
   if (state.startPoint?.marker) { state.startPoint.marker.setMap(null); }
   if (state._routePoly) { state._routePoly.setMap(null); state._routePoly = null; }
   if (state._routePolyPreview) { state._routePolyPreview.setMap(null); state._routePolyPreview = null; }
+  if (state._completedPoly) { state._completedPoly.setMap(null); state._completedPoly = null; }
   state.startPoint = null;
   state.deliveries.forEach(d => { if (d.marker) d.marker.setMap(null); });
   state.deliveries = [];
