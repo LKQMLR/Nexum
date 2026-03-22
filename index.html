@@ -300,6 +300,29 @@
     /* ── MAP ── */
     #map { flex: 1; height: 100%; }
 
+    /* ── TOGGLE MOBILE ── */
+    #mobile-toggle {
+      display: none; position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+      z-index: 20; background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; padding: 10px 20px; border-radius: 30px; font-size: .85rem; font-weight: 600;
+      border: none; box-shadow: 0 4px 16px rgba(0,0,0,.4); cursor: pointer;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      #sidebar {
+        width: 100%; min-width: unset; height: 100vh;
+        position: fixed; top: 0; left: 0; z-index: 15;
+        transition: transform .3s ease;
+      }
+      #sidebar.hidden { transform: translateY(100%); }
+      #map { width: 100%; height: 100vh; }
+      #mobile-toggle { display: block; }
+      .sidebar-header { padding: 14px 16px 10px; }
+      .sidebar-body { padding: 10px; }
+    }
+
     /* ── AUTOCOMPLETE ── */
     .pac-container { z-index: 10001 !important; }
     .freq-dropdown {
@@ -408,6 +431,7 @@
 </div>
 
 <div id="map"></div>
+<button id="mobile-toggle" onclick="toggleSidebar()">Voir les adresses</button>
 
 <script>
 const state = {
@@ -913,6 +937,16 @@ function restoreMapPrefs() {
   } catch {}
 }
 function setUIBusy(b) { ['btn-set-start','btn-add','btn-optimize','btn-reset','btn-nav-start'].forEach(id => { const e = document.getElementById(id); if (e) e.disabled = b; }); }
+// ── MOBILE TOGGLE ──
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const btn = document.getElementById('mobile-toggle');
+  sb.classList.toggle('hidden');
+  btn.textContent = sb.classList.contains('hidden') ? 'Voir les adresses' : 'Voir la carte';
+}
+// Start mobile with sidebar hidden (show map first)
+if (window.innerWidth <= 768) document.getElementById('sidebar').classList.add('hidden');
+
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
 </script>
 </body>
