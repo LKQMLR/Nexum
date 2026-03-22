@@ -811,8 +811,9 @@ async function handleAddDelivery() {
     state.deliveries.push({ id: idCounter++, address: addr, ...geo, placeName, marker, note: freqNote });
     state.map.panTo({ lat: geo.lat, lng: geo.lng }); state.map.setZoom(14);
     renderDeliveryList(); saveFrequentAddress({ address: addr, lat: geo.lat, lng: geo.lng, formatted: geo.formatted, placeName });
-    updateAutocompleteBias(); input.value = ''; input.dataset.resolved = '';
+    updateAutocompleteBias(); input.value = ''; input.dataset.resolved = ''; input.dataset.placeName = '';
     showStatus('success', `${state.deliveries.length} adresse(s) ajoutée(s).`); saveSession();
+    input.focus();
   } catch (e) { showStatus('error', e.message); } finally { setUIBusy(false); }
 }
 
@@ -880,6 +881,19 @@ function initDragAndDrop() {
     function moveGhost(x, y) { if (ghost) { ghost.style.left = (x + 12) + 'px'; ghost.style.top = (y - 16) + 'px'; } }
     function removeGhost() { if (ghost) { ghost.remove(); ghost = null; } }
 
+    let scrollInterval = null;
+    function autoScroll(y) {
+      const rect = ul.getBoundingClientRect();
+      const zone = 40;
+      clearInterval(scrollInterval);
+      if (y < rect.top + zone && ul.scrollTop > 0) {
+        scrollInterval = setInterval(() => { ul.scrollTop -= 6; }, 16);
+      } else if (y > rect.bottom - zone && ul.scrollTop < ul.scrollHeight - ul.clientHeight) {
+        scrollInterval = setInterval(() => { ul.scrollTop += 6; }, 16);
+      }
+    }
+    function stopAutoScroll() { clearInterval(scrollInterval); scrollInterval = null; }
+
     function clearHighlights() { items.forEach(el => el.classList.remove('drag-neighbor-above','drag-neighbor-below')); }
     function highlightGap(y) {
       clearHighlights();
@@ -893,10 +907,10 @@ function initDragAndDrop() {
       e.preventDefault();
       const dragIdx = parseInt(li.dataset.idx);
       li.classList.add('dragging'); createGhost(li, e.clientX, e.clientY);
-      const onMove = e2 => { moveGhost(e2.clientX, e2.clientY); highlightGap(e2.clientY); };
+      const onMove = e2 => { moveGhost(e2.clientX, e2.clientY); highlightGap(e2.clientY); autoScroll(e2.clientY); };
       const onUp = e2 => {
         document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp);
-        li.classList.remove('dragging'); clearHighlights(); removeGhost();
+        stopAutoScroll(); li.classList.remove('dragging'); clearHighlights(); removeGhost();
         const gap = getInsertGap(ul, e2.clientY, li);
         if (gap.insertIdx !== dragIdx && gap.insertIdx !== dragIdx + 1) {
           const to = gap.insertIdx > dragIdx ? gap.insertIdx - 1 : gap.insertIdx;
@@ -914,11 +928,11 @@ function initDragAndDrop() {
     }, { passive: false });
     handle.addEventListener('touchmove', e => {
       e.preventDefault(); const touch = e.touches[0]; moveGhost(touch.clientX, touch.clientY);
-      highlightGap(touch.clientY);
+      highlightGap(touch.clientY); autoScroll(touch.clientY);
     }, { passive: false });
     handle.addEventListener('touchend', e => {
       const dragIdx = li._dragIdx;
-      li.classList.remove('dragging'); clearHighlights(); removeGhost();
+      stopAutoScroll(); li.classList.remove('dragging'); clearHighlights(); removeGhost();
       const touch = e.changedTouches[0];
       const gap = getInsertGap(ul, touch.clientY, li);
       if (gap.insertIdx !== dragIdx && gap.insertIdx !== dragIdx + 1) {
