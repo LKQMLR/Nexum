@@ -139,6 +139,20 @@
       transform: translateY(3px);
     }
     #delivery-list li.dragging { opacity: .15; }
+    #delivery-list li.delivered {
+      opacity: .5; border-color: var(--green);
+      background: var(--green-bg);
+    }
+    #delivery-list li.delivered .delivery-num {
+      background: var(--green); box-shadow: none;
+    }
+    #delivery-list li.delivered .delivery-addr::after {
+      content: ' — Livré'; color: var(--green); font-size: .7rem; font-weight: 600;
+    }
+    #delivery-list li.nav-current-stop {
+      border-color: var(--accent);
+      box-shadow: 0 0 8px rgba(79,140,255,.3);
+    }
     .delivery-num {
       background: linear-gradient(135deg, var(--accent), var(--accent2));
       color: #fff; border-radius: 6px;
@@ -699,10 +713,12 @@ function renderDeliveryList() {
   const countEl = document.getElementById('delivery-count');
   countEl.textContent = state.deliveries.length ? `(${state.deliveries.length})` : '';
   if (!state.deliveries.length) { ul.innerHTML = ''; return; }
+  const navActive = document.getElementById('nav-panel').classList.contains('visible');
   ul.innerHTML = state.deliveries.map((d, i) => {
     const name = d.formatted.length > 50 ? d.formatted.substring(0, 47) + '...' : d.formatted;
     const noteHtml = d.note ? `<div class="delivery-note" title="${d.note.replace(/"/g,'&quot;')}">${d.note}</div>` : '';
-    return `<li data-idx="${i}" data-id="${d.id}">
+    const liClass = navActive && i < state.navIndex ? 'delivered' : navActive && i === state.navIndex ? 'nav-current-stop' : '';
+    return `<li data-idx="${i}" data-id="${d.id}" class="${liClass}">
       <div class="drag-handle">&#8942;&#8942;</div>
       <div class="delivery-num">${i + 1}</div>
       <div class="delivery-addr">${name}${noteHtml}
@@ -974,7 +990,7 @@ function startNavigation() {
   state.navIndex = 0; state.followMode = true;
   document.getElementById('btn-nav-start').classList.remove('visible');
   document.getElementById('nav-panel').classList.add('visible');
-  updateNavPanel(); saveSession();
+  updateNavPanel(); renderDeliveryList(); saveSession();
   // Wake Lock — écran toujours allumé
   if ('wakeLock' in navigator) navigator.wakeLock.request('screen').then(l => state.wakeLock = l).catch(() => {});
   state.watchId = navigator.geolocation.watchPosition(
@@ -1037,7 +1053,7 @@ function nextNavStop() {
     exitNavigation(); showStatus('success', 'Tourn\u00e9e termin\u00e9e !');
     localStorage.removeItem('livreurGPS_session'); return;
   }
-  state.navIndex++; state.followMode = true; updateNavPanel(); saveSession();
+  state.navIndex++; state.followMode = true; updateNavPanel(); renderDeliveryList(); saveSession();
 }
 function openInGoogleMaps() {
   const dest = state.navStops[state.navIndex + 1];
