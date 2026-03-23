@@ -182,24 +182,28 @@
       background: linear-gradient(135deg, #a78bfa, #7c3aed);
       box-shadow: 0 1px 4px rgba(124,58,237,.35);
     }
-    .sector-badge {
-      position: absolute; bottom: 4px; right: 6px;
-      font-size: .55rem; font-weight: 700; padding: 2px 5px;
-      border-radius: 4px; cursor: pointer; opacity: .3;
-      color: var(--text2); transition: all .2s; z-index: 3;
-      user-select: none; line-height: 1;
+    #btn-sector {
+      width: 100%; margin-top: 6px; padding: 6px 10px;
+      border: 1px solid var(--border); border-radius: 8px;
+      background: var(--bg); color: var(--text2);
+      font-size: .7rem; font-weight: 600; cursor: pointer;
+      transition: all .2s;
     }
-    .sector-badge.active { opacity: 1; color: #fff; }
-    .sector-badge.s1 { background: #ef4444; }
-    .sector-badge.s2 { background: #f59e0b; }
-    .sector-badge.s3 { background: #10b981; }
-    .sector-badge.s4 { background: #3b82f6; }
-    .sector-badge.s5 { background: #8b5cf6; }
-    #delivery-list li.sector-1 { border-color: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,.15); }
-    #delivery-list li.sector-2 { border-color: #f59e0b; box-shadow: 0 0 8px rgba(245,158,11,.15); }
-    #delivery-list li.sector-3 { border-color: #10b981; box-shadow: 0 0 8px rgba(16,185,129,.15); }
-    #delivery-list li.sector-4 { border-color: #3b82f6; box-shadow: 0 0 8px rgba(59,130,246,.15); }
-    #delivery-list li.sector-5 { border-color: #8b5cf6; box-shadow: 0 0 8px rgba(139,92,246,.15); }
+    #btn-sector.s1 { background: #ef4444; color: #fff; border-color: #ef4444; }
+    #btn-sector.s2 { background: #f59e0b; color: #fff; border-color: #f59e0b; }
+    #btn-sector.s3 { background: #10b981; color: #fff; border-color: #10b981; }
+    #btn-sector.s4 { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+    #btn-sector.s5 { background: #8b5cf6; color: #fff; border-color: #8b5cf6; }
+    #delivery-list li.sector-1 { border-left: 3px solid #ef4444; }
+    #delivery-list li.sector-2 { border-left: 3px solid #f59e0b; }
+    #delivery-list li.sector-3 { border-left: 3px solid #10b981; }
+    #delivery-list li.sector-4 { border-left: 3px solid #3b82f6; }
+    #delivery-list li.sector-5 { border-left: 3px solid #8b5cf6; }
+    #delivery-list li.delivery-locked.sector-1,
+    #delivery-list li.delivery-locked.sector-2,
+    #delivery-list li.delivery-locked.sector-3,
+    #delivery-list li.delivery-locked.sector-4,
+    #delivery-list li.delivery-locked.sector-5 { border-left: 1px solid var(--yellow); }
     .delivery-addr { flex: 1; line-height: 1.35; word-break: break-word; min-width: 0; font-size: .78rem; }
     .delivery-place-name {
       font-size: .72rem; font-weight: 600; color: var(--accent); margin-bottom: 1px;
@@ -463,7 +467,7 @@
 
 <div id="sidebar">
   <div class="sidebar-header">
-    <h1>CarGo <span style="font-size:.5rem;font-weight:400;opacity:.5;vertical-align:middle">v78</span></h1>
+    <h1>CarGo <span style="font-size:.5rem;font-weight:400;opacity:.5;vertical-align:middle">v79</span></h1>
     <p>Planification intelligente de tournées</p>
   </div>
   <div class="sidebar-body">
@@ -493,6 +497,7 @@
           </div>
           <button class="btn-primary" id="btn-add" onclick="handleAddDelivery()">+</button>
         </div>
+        <button id="btn-sector" onclick="cycleSector()" title="Secteur actif pour les nouvelles adresses">Aucun secteur</button>
       </div>
 
       <button id="btn-optimize" onclick="optimizeRoute()">Optimiser l'itinéraire</button>
@@ -812,10 +817,7 @@ function renderDeliveryList() {
       ? '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'
       : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>';
     const sec = d.sector || 0;
-    const liClasses = [d.locked ? 'delivery-locked' : '', sec ? `sector-${sec}` : ''].filter(Boolean).join(' ');
-    const sectorBadge = sec
-      ? `<div class="sector-badge active s${sec}" onclick="toggleSector(${d.id})">S${sec}</div>`
-      : `<div class="sector-badge" onclick="toggleSector(${d.id})">S</div>`;
+    const liClasses = [d.locked ? 'delivery-locked' : '', sec && !d.locked ? `sector-${sec}` : ''].filter(Boolean).join(' ');
     return `<li data-idx="${i}" data-id="${d.id}" class="${liClasses}">
       <div class="drag-handle">&#8942;&#8942;</div>
       <div class="delivery-num${d.customOrder ? ' custom' : ''}">${i + 1}</div>
@@ -824,7 +826,6 @@ function renderDeliveryList() {
           onblur="saveNote(${d.id}, this.value)" data-id="${d.id}" />${legInfo}
       </div>
       <div class="${badgeClass}" onclick="toggleLock(${d.id})">${lockSvg}</div>
-      ${sectorBadge}
     </li>`;
   }).join('');
   initDragAndDrop();
@@ -864,20 +865,13 @@ function toggleLock(id) {
   }
   saveSession();
 }
-function toggleSector(id) {
-  const d = state.deliveries.find(d => d.id === id); if (!d) return;
-  d.sector = ((d.sector || 0) + 1) % 6; // 0=none, 1-5=sectors
-  const li = document.querySelector(`[data-id="${id}"]`);
-  if (li) {
-    li.className = li.className.replace(/sector-\d/g, '').trim();
-    if (d.sector) li.classList.add(`sector-${d.sector}`);
-    const badge = li.querySelector('.sector-badge');
-    if (badge) {
-      badge.className = d.sector ? `sector-badge active s${d.sector}` : 'sector-badge';
-      badge.textContent = d.sector ? `S${d.sector}` : 'S';
-    }
-  }
-  saveSession();
+let activeSector = 0;
+const SECTOR_LABELS = ['Aucun secteur', 'Secteur 1', 'Secteur 2', 'Secteur 3', 'Secteur 4', 'Secteur 5'];
+function cycleSector() {
+  activeSector = (activeSector + 1) % 6;
+  const btn = document.getElementById('btn-sector');
+  btn.textContent = SECTOR_LABELS[activeSector];
+  btn.className = activeSector ? `s${activeSector}` : '';
 }
 function removeDelivery(id) {
   const idx = state.deliveries.findIndex(d => d.id === id); if (idx === -1) return;
@@ -925,7 +919,7 @@ async function handleAddDelivery() {
     const freq = getFrequentAddresses().find(a => a.formatted === geo.formatted) || {};
     const freqNote = freq.note || '';
     const placeName = geo.placeName || freq.placeName || '';
-    state.deliveries.push({ id: idCounter++, address: addr, ...geo, placeName, marker, note: freqNote });
+    state.deliveries.push({ id: idCounter++, address: addr, ...geo, placeName, marker, note: freqNote, sector: activeSector });
     state.map.panTo({ lat: geo.lat, lng: geo.lng }); state.map.setZoom(14);
     renderDeliveryList(); saveFrequentAddress({ address: addr, lat: geo.lat, lng: geo.lng, formatted: geo.formatted, placeName });
     updateAutocompleteBias(); input.value = ''; input.dataset.resolved = ''; input.dataset.placeName = '';
@@ -1211,7 +1205,7 @@ function initTouchGestures() {
   items.forEach(li => {
     let startX = 0, startY = 0, moved = false;
     li.addEventListener('touchstart', e => {
-      if (e.target.closest('.drag-handle') || e.target.closest('.delivery-note-input') || e.target.closest('.lock-badge') || e.target.closest('.sector-badge')) return;
+      if (e.target.closest('.drag-handle') || e.target.closest('.delivery-note-input') || e.target.closest('.lock-badge')) return;
       startX = e.touches[0].clientX; startY = e.touches[0].clientY; moved = false;
     }, { passive: true });
     li.addEventListener('touchmove', e => {
