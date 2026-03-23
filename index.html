@@ -491,7 +491,7 @@
 
 <div id="sidebar">
   <div class="sidebar-header">
-    <h1>CarGo <span style="font-size:.5rem;font-weight:400;opacity:.5;vertical-align:middle">v84</span></h1>
+    <h1>CarGo <span id="version-tag" style="font-size:.5rem;font-weight:400;opacity:.5;vertical-align:middle;cursor:pointer" onclick="toggleSimMode()">v85</span></h1>
     <p>Planification intelligente de tournées</p>
   </div>
   <div class="sidebar-body">
@@ -1404,17 +1404,22 @@ function startNavigation() {
   document.getElementById('btn-nav-start').classList.remove('visible');
   document.getElementById('nav-panel').classList.add('visible');
   updateNavPanel(); renderDeliveryList(); renderRouteSteps(); updateRouteProgress(); saveSession();
-  openInGoogleMaps();
-  // Wake Lock — écran toujours allumé
-  requestWakeLock();
-  state.watchId = navigator.geolocation.watchPosition(
-    pos => updateGPSPosition(pos.coords),
-    err => {
-      const msgs = { 1: 'G\u00e9olocalisation refus\u00e9e.', 2: 'Position indisponible.', 3: 'D\u00e9lai d\u00e9pass\u00e9.' };
-      showStatus('error', msgs[err.code] || 'Erreur GPS.');
-    },
-    { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 }
-  );
+  if (_simMode) {
+    state.watchId = 1; // fake ID
+    startSim();
+  } else {
+    openInGoogleMaps();
+    // Wake Lock — écran toujours allumé
+    requestWakeLock();
+    state.watchId = navigator.geolocation.watchPosition(
+      pos => updateGPSPosition(pos.coords),
+      err => {
+        const msgs = { 1: 'G\u00e9olocalisation refus\u00e9e.', 2: 'Position indisponible.', 3: 'D\u00e9lai d\u00e9pass\u00e9.' };
+        showStatus('error', msgs[err.code] || 'Erreur GPS.');
+      },
+      { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 }
+    );
+  }
 }
 function updateGPSPosition(coords) {
   const pos = { lat: coords.latitude, lng: coords.longitude };
@@ -1574,15 +1579,55 @@ function updateRouteProgress() {
   }
 }
 function exitNavigation() {
+  stopSim();
   clearTimeout(state._recenterTimer);
   if (state.wakeLock) { state.wakeLock.release(); state.wakeLock = null; }
-  if (state.watchId !== null) { navigator.geolocation.clearWatch(state.watchId); state.watchId = null; }
+  if (state.watchId !== null) { if (!_simMode) navigator.geolocation.clearWatch(state.watchId); state.watchId = null; }
   if (state.posMarker) { state.posMarker.setMap(null); state.posMarker = null; }
   if (state.posCircle) { state.posCircle.setMap(null); state.posCircle = null; }
   document.getElementById('nav-panel').classList.remove('visible');
   document.getElementById('btn-nav-start').classList.add('visible');
   state.markers.forEach(m => m.setAnimation(null));
   saveSession();
+}
+
+// ── SIMULATION MODE ──
+let _simMode = false, _simInterval = null, _simPathIdx = 0, _simPath = [];
+function toggleSimMode() {
+  _simMode = !_simMode;
+  const tag = document.getElementById('version-tag');
+  if (_simMode) {
+    tag.style.color = '#ef4444';
+    tag.textContent = 'v85 [SIM]';
+    showStatus('success', 'Mode simulation activé. Lancez une tournée pour simuler le trajet.');
+  } else {
+    stopSim();
+    tag.style.color = '';
+    tag.textContent = 'v85';
+    showStatus('success', 'Mode simulation désactivé.');
+  }
+}
+function startSim() {
+  if (!_simMode || !state.navLegs) return;
+  _simPath = [];
+  // Build path from all legs
+  state.navLegs.forEach(leg => {
+    if (leg.steps) leg.steps.forEach(step => {
+      step.path.forEach(p => _simPath.push({ lat: p.lat(), lng: p.lng() }));
+    });
+  });
+  if (!_simPath.length) return;
+  _simPathIdx = 0;
+  // Move every 500ms, skip some points for speed
+  _simInterval = setInterval(() => {
+    if (_simPathIdx >= _simPath.length) { stopSim(); return; }
+    const p = _simPath[_simPathIdx];
+    updateGPSPosition({ latitude: p.lat, longitude: p.lng, accuracy: 10 });
+    _simPathIdx += 3; // skip 3 points = faster
+  }, 500);
+}
+function stopSim() {
+  if (_simInterval) { clearInterval(_simInterval); _simInterval = null; }
 }
 
 function resetAll() {
