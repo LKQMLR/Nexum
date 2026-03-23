@@ -445,7 +445,7 @@
 
 <div id="sidebar">
   <div class="sidebar-header">
-    <h1>CarGo <span style="font-size:.5rem;font-weight:400;opacity:.5;vertical-align:middle">v74</span></h1>
+    <h1>CarGo <span style="font-size:.5rem;font-weight:400;opacity:.5;vertical-align:middle">v75</span></h1>
     <p>Planification intelligente de tournées</p>
   </div>
   <div class="sidebar-body">
@@ -907,6 +907,27 @@ function nearestNeighborTSP(mx, start = 0) {
     const c = tour[tour.length-1]; let nn = -1, nd = Infinity;
     for (let j = 0; j < n; j++) { if (!vis[j] && mx[c][j] < nd) { nn = j; nd = mx[c][j]; } }
     if (nn === -1) break; vis[nn] = true; tour.push(nn);
+  }
+  return twoOpt(tour, mx);
+}
+function twoOpt(tour, mx) {
+  const n = tour.length;
+  let improved = true;
+  while (improved) {
+    improved = false;
+    for (let i = 1; i < n - 1; i++) {
+      for (let j = i + 1; j < n; j++) {
+        const a = tour[i - 1], b = tour[i], c = tour[j], d = j + 1 < n ? tour[j + 1] : null;
+        const oldDist = mx[a][b] + (d !== null ? mx[c][d] : 0);
+        const newDist = mx[a][c] + (d !== null ? mx[b][d] : 0);
+        if (newDist < oldDist - 1e-10) {
+          // Reverse the segment between i and j
+          let left = i, right = j;
+          while (left < right) { const tmp = tour[left]; tour[left] = tour[right]; tour[right] = tmp; left++; right--; }
+          improved = true;
+        }
+      }
+    }
   }
   return tour;
 }

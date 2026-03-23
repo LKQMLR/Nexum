@@ -1,4 +1,4 @@
-const CACHE = 'cargo-v74';
+const CACHE = 'cargo-v75';
 const ASSETS = ['./index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
