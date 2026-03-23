@@ -14,10 +14,11 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1965892145955946" crossorigin="anonymous"></script>
   <style>
     :root {
-      --bg: #1a1a2e;
-      --surface: #16213e;
-      --surface2: #1c2a4a;
-      --border: #2a3a5c;
+      --bg: #141a24;
+      --surface: #1b2432;
+      --surface2: #1e2a3a;
+      --card: #243244;
+      --border: #2e3e52;
       --text: #e2e8f0;
       --text2: #94a3b8;
       --accent: #4f8cff;
@@ -50,7 +51,7 @@
       overflow-y: auto; overflow-x: hidden;
     }
     .sidebar-header {
-      background: linear-gradient(135deg, #0f3460, #1a5276);
+      background: linear-gradient(135deg, #1a2d42, #243a50);
       padding: 18px 20px 14px;
       flex-shrink: 0;
     }
@@ -71,19 +72,18 @@
     }
     /* Point de départ — discret, en retrait */
     .section-start {
-      background: rgba(22,33,62,.4); border-color: rgba(42,58,92,.5);
+      background: rgba(20,26,36,.6); border-color: rgba(46,62,82,.4);
       padding: 10px;
     }
     .section-start .section-title { opacity: .6; font-size: .62rem; }
-    /* Adresses de livraison — back-end, neutre mais présent */
+    /* Adresses de livraison — neutre */
     .section-deliveries {
-      background: var(--surface2); border-color: var(--border);
+      background: var(--surface); border-color: var(--border);
     }
-    /* Itinéraire optimisé — front-end, actif, mis en avant */
+    /* Itinéraire optimisé — actif, subtil */
     .section-route {
-      background: linear-gradient(135deg, rgba(22,33,62,.9), rgba(15,52,96,.6));
-      border-color: rgba(100,180,255,.3);
-      box-shadow: 0 0 20px rgba(80,160,255,.1), inset 0 0 30px rgba(80,160,255,.03);
+      background: var(--surface);
+      border-color: rgba(79,140,255,.25);
     }
     .section-route .results-title { color: #60b0ff; }
     #app-sections { display: none; flex-direction: column; gap: 12px; }
@@ -155,9 +155,10 @@
     }
     #delivery-list li {
       display: flex; align-items: center; gap: 6px;
-      background: var(--bg); border: 1px solid var(--border);
+      background: var(--card); border: 1px solid var(--border);
       border-radius: 10px; padding: 10px 28px 10px 6px;
       font-size: .8rem; color: var(--text);
+      box-shadow: 0 2px 8px rgba(0,0,0,.25), 0 1px 3px rgba(0,0,0,.15);
       transition: box-shadow .2s, border-color .2s, margin .2s;
     }
     #delivery-list li.drag-neighbor-above {
@@ -306,8 +307,9 @@
     #route-steps { list-style: none; display: flex; flex-direction: column; gap: 8px; }
     #route-steps li {
       display: flex; gap: 10px;
-      background: var(--bg); border: 1px solid var(--border);
+      background: var(--card); border: 1px solid var(--border);
       border-radius: 10px; padding: 12px 14px; font-size: .78rem; color: var(--text2);
+      box-shadow: 0 2px 8px rgba(0,0,0,.25), 0 1px 3px rgba(0,0,0,.15);
     }
     .step-badge {
       flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
@@ -338,6 +340,11 @@
     #route-steps li.step-current {
       border-color: var(--accent); box-shadow: 0 0 8px rgba(79,140,255,.3);
     }
+    #route-steps li.sector-1 { border-color: rgba(59,130,246,.35); background: rgba(59,130,246,.08); }
+    #route-steps li.sector-2 { border-color: rgba(13,148,136,.35); background: rgba(13,148,136,.08); }
+    #route-steps li.sector-3 { border-color: rgba(217,119,6,.35); background: rgba(217,119,6,.08); }
+    #route-steps li.sector-4 { border-color: rgba(219,39,119,.35); background: rgba(219,39,119,.08); }
+    #route-steps li.sector-5 { border-color: rgba(124,58,237,.35); background: rgba(124,58,237,.08); }
 
     /* ── NAVIGATION ── */
     #btn-nav-start {
@@ -412,6 +419,7 @@
     .prox-current { font-size: .7rem; color: var(--text2); margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border); line-height: 1.4; }
     .prox-text { font-size: .82rem; color: var(--text); margin-bottom: 10px; line-height: 1.4; }
     .prox-text span { font-size: .72rem; color: var(--text2); }
+    .prox-tooltip.show { display:block !important; }
     .prox-btns { display: flex; gap: 8px; }
     .prox-btns button {
       flex: 1; padding: 8px; border: none; border-radius: 8px; font-weight: 600;
@@ -535,9 +543,12 @@
       </div>
 
       <button id="btn-nav-start" onclick="startNavigation()">Commencer la tournée</button>
-      <label id="prox-toggle" style="display:flex;align-items:center;gap:6px;margin:6px 0 2px 2px;font-size:.72rem;color:var(--text2);cursor:pointer;user-select:none;">
-        <input type="checkbox" id="prox-check" style="accent-color:var(--accent);width:14px;height:14px;cursor:pointer;" checked> Alertes de proximité
-      </label>
+      <div id="prox-toggle" style="display:flex;align-items:center;gap:8px;margin:8px 4px 2px;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;">
+        <label style="display:flex;align-items:center;gap:6px;font-size:.74rem;color:var(--text2);cursor:pointer;user-select:none;flex:1;">
+          <input type="checkbox" id="prox-check" style="accent-color:var(--accent);width:14px;height:14px;cursor:pointer;" checked> Alertes de proximité
+        </label>
+        <span class="prox-help" style="position:relative;width:18px;height:18px;border-radius:50%;background:var(--surface2,#232340);color:var(--text2);font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;" onclick="this.querySelector('.prox-tooltip').classList.toggle('show')">?<span class="prox-tooltip" style="display:none;position:absolute;bottom:calc(100% + 8px);right:0;width:220px;padding:10px 12px;background:var(--surface2,#232340);border:1px solid var(--border);border-radius:10px;font-size:.7rem;font-weight:400;color:var(--text);line-height:1.4;text-align:left;box-shadow:0 4px 16px rgba(0,0,0,.4);z-index:100;">Si vous passez près d'une livraison prévue plus loin, une alerte propose de la faire maintenant.</span></span>
+      </div>
 
       <div id="nav-panel">
         <button id="btn-nav-center" onclick="centerOnMe()" title="Recentrer">&#8982;</button>
@@ -1384,8 +1395,12 @@ function renderRouteSteps() {
     const pn = d && d.placeName ? `<div class="step-place-name">${d.placeName}</div>` : '';
     const note = d && d.note ? `<div class="step-note">— ${d.note}</div>` : '';
     const stepClass = navActive && i < state.navIndex ? 'step-delivered' : navActive && i === state.navIndex ? 'step-current' : '';
+    const sectorClass = d && d.sector ? 'sector-' + d.sector : '';
+    const secCols = { 1: '#3b82f6', 2: '#0d9488', 3: '#d97706', 4: '#db2777', 5: '#7c3aed' };
+    const badgeStyle = d && d.sector && secCols[d.sector] ? ` style="background:${secCols[d.sector]}"` : '';
     const delivered = navActive && i < state.navIndex ? '<div class="step-status">Livré ✓</div>' : '';
-    html += `<li class="${stepClass}"><div class="step-badge">${i+1}</div><div class="step-content">
+    html += `<li style="list-style:none;display:flex;justify-content:center;background:none;border:none;box-shadow:none;padding:0;margin:-4px 0;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".4"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></li>`;
+    html += `<li class="${stepClass} ${sectorClass}"><div class="step-badge"${badgeStyle}>${i+1}</div><div class="step-content">
       ${pn}<div class="step-addr">${stops[i+1].formatted}</div>
       <div class="step-meta"><span>~${etaStr}</span></div>
       ${note}${delivered}
