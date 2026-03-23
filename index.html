@@ -400,6 +400,25 @@
     }
     .nav-arrived { color: var(--green) !important; font-weight: 600; }
 
+    /* ── PROXIMITY ALERT ── */
+    #proximity-alert {
+      position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+      z-index: 9999; background: var(--card); border: 1px solid var(--accent);
+      border-radius: 14px; padding: 14px 18px; width: calc(100% - 32px); max-width: 360px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.5), 0 0 12px rgba(79,140,255,.2);
+      animation: slideUp .3s ease;
+    }
+    @keyframes slideUp { from { transform: translateX(-50%) translateY(40px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+    .prox-text { font-size: .82rem; color: var(--text); margin-bottom: 10px; line-height: 1.4; }
+    .prox-text span { font-size: .72rem; color: var(--text2); }
+    .prox-btns { display: flex; gap: 8px; }
+    .prox-btns button {
+      flex: 1; padding: 8px; border: none; border-radius: 8px; font-weight: 600;
+      font-size: .75rem; cursor: pointer;
+    }
+    .prox-btns button:first-child { background: var(--green); color: #fff; }
+    .prox-btns .prox-skip { background: var(--bg); color: var(--text2); border: 1px solid var(--border); }
+
     /* ── MAP PREVIEW ── */
     #map-preview {
       display: none; width: 100%; height: 180px;
@@ -472,7 +491,7 @@
 
 <div id="sidebar">
   <div class="sidebar-header">
-    <h1>CarGo <span style="font-size:.5rem;font-weight:400;opacity:.5;vertical-align:middle">v83</span></h1>
+    <h1>CarGo <span style="font-size:.5rem;font-weight:400;opacity:.5;vertical-align:middle">v84</span></h1>
     <p>Planification intelligente de tournées</p>
   </div>
   <div class="sidebar-body">
@@ -1381,6 +1400,7 @@ function startNavigation() {
   if (!state.navStops || !state.navLegs) return;
   if (!navigator.geolocation) { showStatus('error', 'G\u00e9olocalisation non disponible sur ce navigateur.'); return; }
   state.navIndex = 0; state.followMode = true;
+  _proximityAlertShown = {}; _proximityAlertOpen = false;
   document.getElementById('btn-nav-start').classList.remove('visible');
   document.getElementById('nav-panel').classList.add('visible');
   updateNavPanel(); renderDeliveryList(); renderRouteSteps(); updateRouteProgress(); saveSession();
@@ -1426,7 +1446,54 @@ function updateGPSPosition(coords) {
       meta.textContent = dist < 1000 ? Math.round(dist) + ' m restant' : (dist / 1000).toFixed(1) + ' km restant';
       meta.classList.remove('nav-arrived');
     }
+    // Proximity alert for upcoming deliveries
+    checkProximityAlert(pos);
   }
+}
+let _proximityAlertShown = {};
+let _proximityAlertOpen = false;
+function checkProximityAlert(pos) {
+  if (_proximityAlertOpen) return;
+  const RADIUS = 150; // meters
+  for (let i = state.navIndex + 1; i < state.deliveries.length; i++) {
+    if (i === state.navIndex) continue; // skip current
+    const d = state.deliveries[i];
+    const dist = haversine(pos, d);
+    if (dist < RADIUS && !_proximityAlertShown[d.id]) {
+      _proximityAlertShown[d.id] = true;
+      _proximityAlertOpen = true;
+      const label = d.placeName || d.formatted;
+      const num = i + 1;
+      showProximityAlert(num, label, i);
+      break;
+    }
+  }
+}
+function showProximityAlert(num, label, deliveryIdx) {
+  // Remove existing alert if any
+  const existing = document.getElementById('proximity-alert');
+  if (existing) existing.remove();
+  const div = document.createElement('div');
+  div.id = 'proximity-alert';
+  div.innerHTML = `
+    <div class="prox-text">📍 Livraison <b>${num}</b> à proximité<br><span>${label}</span></div>
+    <div class="prox-btns">
+      <button onclick="acceptProximitySwitch(${deliveryIdx})">Livrer maintenant</button>
+      <button class="prox-skip" onclick="dismissProximityAlert()">Ignorer</button>
+    </div>`;
+  document.body.appendChild(div);
+}
+function acceptProximitySwitch(idx) {
+  // Jump navigation to this delivery
+  state.navIndex = idx;
+  updateNavPanel(); renderDeliveryList(); renderRouteSteps(); updateRouteProgress(); saveSession();
+  openInGoogleMaps();
+  dismissProximityAlert();
+}
+function dismissProximityAlert() {
+  _proximityAlertOpen = false;
+  const el = document.getElementById('proximity-alert');
+  if (el) el.remove();
 }
 function updateNavPanel() {
   const i = state.navIndex, total = state.deliveries.length;
