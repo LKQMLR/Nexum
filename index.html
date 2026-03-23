@@ -182,11 +182,11 @@
       background: linear-gradient(135deg, #a78bfa, #7c3aed);
       box-shadow: 0 1px 4px rgba(124,58,237,.35);
     }
-    .delivery-num.sec-1 { background: #60a5fa; box-shadow: 0 1px 4px rgba(96,165,250,.4); }
-    .delivery-num.sec-2 { background: #6ee7b7; color: #1a1a2e; box-shadow: 0 1px 4px rgba(110,231,183,.4); }
-    .delivery-num.sec-3 { background: #fbbf24; color: #1a1a2e; box-shadow: 0 1px 4px rgba(251,191,36,.4); }
-    .delivery-num.sec-4 { background: #f9a8d4; color: #1a1a2e; box-shadow: 0 1px 4px rgba(249,168,212,.4); }
-    .delivery-num.sec-5 { background: #a5b4fc; color: #1a1a2e; box-shadow: 0 1px 4px rgba(165,180,252,.4); }
+    .delivery-num.sec-1 { background: #3b82f6; box-shadow: 0 1px 4px rgba(59,130,246,.4); }
+    .delivery-num.sec-2 { background: #0d9488; box-shadow: 0 1px 4px rgba(13,148,136,.4); }
+    .delivery-num.sec-3 { background: #d97706; box-shadow: 0 1px 4px rgba(217,119,6,.4); }
+    .delivery-num.sec-4 { background: #db2777; box-shadow: 0 1px 4px rgba(219,39,119,.4); }
+    .delivery-num.sec-5 { background: #7c3aed; box-shadow: 0 1px 4px rgba(124,58,237,.4); }
     #btn-sector {
       width: 100%; margin-top: 6px; padding: 6px 10px;
       border: 1px solid var(--border); border-radius: 8px;
@@ -194,16 +194,16 @@
       font-size: .7rem; font-weight: 600; cursor: pointer;
       transition: all .2s;
     }
-    #btn-sector.s1 { background: #60a5fa; color: #fff; border-color: #60a5fa; }
-    #btn-sector.s2 { background: #6ee7b7; color: #1a1a2e; border-color: #6ee7b7; }
-    #btn-sector.s3 { background: #fbbf24; color: #1a1a2e; border-color: #fbbf24; }
-    #btn-sector.s4 { background: #f9a8d4; color: #1a1a2e; border-color: #f9a8d4; }
-    #btn-sector.s5 { background: #a5b4fc; color: #1a1a2e; border-color: #a5b4fc; }
-    #delivery-list li.sector-1 { border-left: 3px solid #60a5fa; }
-    #delivery-list li.sector-2 { border-left: 3px solid #6ee7b7; }
-    #delivery-list li.sector-3 { border-left: 3px solid #fbbf24; }
-    #delivery-list li.sector-4 { border-left: 3px solid #f9a8d4; }
-    #delivery-list li.sector-5 { border-left: 3px solid #a5b4fc; }
+    #btn-sector.s1 { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+    #btn-sector.s2 { background: #0d9488; color: #fff; border-color: #0d9488; }
+    #btn-sector.s3 { background: #d97706; color: #fff; border-color: #d97706; }
+    #btn-sector.s4 { background: #db2777; color: #fff; border-color: #db2777; }
+    #btn-sector.s5 { background: #7c3aed; color: #fff; border-color: #7c3aed; }
+    #delivery-list li.sector-1 { border-left: 3px solid #3b82f6; }
+    #delivery-list li.sector-2 { border-left: 3px solid #0d9488; }
+    #delivery-list li.sector-3 { border-left: 3px solid #d97706; }
+    #delivery-list li.sector-4 { border-left: 3px solid #db2777; }
+    #delivery-list li.sector-5 { border-left: 3px solid #7c3aed; }
     #delivery-list li.delivery-locked.sector-1,
     #delivery-list li.delivery-locked.sector-2,
     #delivery-list li.delivery-locked.sector-3,
@@ -472,7 +472,7 @@
 
 <div id="sidebar">
   <div class="sidebar-header">
-    <h1>CarGo <span style="font-size:.5rem;font-weight:400;opacity:.5;vertical-align:middle">v82</span></h1>
+    <h1>CarGo <span style="font-size:.5rem;font-weight:400;opacity:.5;vertical-align:middle">v83</span></h1>
     <p>Planification intelligente de tournées</p>
   </div>
   <div class="sidebar-body">
@@ -1309,7 +1309,7 @@ function displayRoute(stops) {
       }
 
       // Place markers
-      const SECTOR_COLS = { 0: '#4f8cff', 1: '#60a5fa', 2: '#6ee7b7', 3: '#fbbf24', 4: '#f9a8d4', 5: '#a5b4fc' };
+      const SECTOR_COLS = { 0: '#4f8cff', 1: '#3b82f6', 2: '#0d9488', 3: '#d97706', 4: '#db2777', 5: '#7c3aed' };
       stops.forEach((s, r) => {
         const lbl = r === 0 ? 'D' : String(r);
         const col = r === 0 ? '#22c55e' : (SECTOR_COLS[s.sector || 0] || '#4f8cff');
