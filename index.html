@@ -403,7 +403,7 @@
     /* ── PROXIMITY ALERT ── */
     #proximity-alert {
       position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
-      z-index: 9999; background: var(--card); border: 1px solid var(--accent);
+      z-index: 9999; background: #1e1e2e; border: 1px solid var(--accent);
       border-radius: 14px; padding: 14px 18px; width: calc(100% - 32px); max-width: 360px;
       box-shadow: 0 8px 32px rgba(0,0,0,.5), 0 0 12px rgba(79,140,255,.2);
       animation: slideUp .3s ease;
@@ -491,7 +491,7 @@
 
 <div id="sidebar">
   <div class="sidebar-header">
-    <h1>CarGo <span id="version-tag" style="font-size:.5rem;font-weight:400;opacity:.5;vertical-align:middle;cursor:pointer" onclick="toggleSimMode()">v86</span></h1>
+    <h1>CarGo <span id="version-tag" style="font-size:.5rem;font-weight:400;opacity:.5;vertical-align:middle;cursor:pointer" onclick="toggleSimMode()">v87</span></h1>
     <p>Planification intelligente de tournées</p>
   </div>
   <div class="sidebar-body">
@@ -1460,8 +1460,7 @@ let _proximityAlertOpen = false;
 function checkProximityAlert(pos) {
   if (_proximityAlertOpen) return;
   const RADIUS = 150; // meters
-  for (let i = state.navIndex + 1; i < state.deliveries.length; i++) {
-    if (i === state.navIndex) continue; // skip current
+  for (let i = state.navIndex + 3; i < state.deliveries.length; i++) {
     const d = state.deliveries[i];
     const dist = haversine(pos, d);
     if (dist < RADIUS && !_proximityAlertShown[d.id]) {
@@ -1598,12 +1597,12 @@ function toggleSimMode() {
   const tag = document.getElementById('version-tag');
   if (_simMode) {
     tag.style.color = '#ef4444';
-    tag.textContent = 'v86 [SIM]';
+    tag.textContent = 'v87 [SIM]';
     showStatus('success', 'Mode simulation activé. Lancez une tournée pour simuler le trajet.');
   } else {
     stopSim();
     tag.style.color = '';
-    tag.textContent = 'v86';
+    tag.textContent = 'v87';
     showStatus('success', 'Mode simulation désactivé.');
   }
 }
