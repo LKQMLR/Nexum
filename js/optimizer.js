@@ -124,34 +124,26 @@ async function optimizeRoute() {
     let prevEnd = state.startPoint;
     for (const s of sectorOrder) {
       const sectorItems = groups[s];
-      // Trouver le point d'entrée le plus proche du secteur précédent
-      let closestIdx = 0, closestDist = Infinity;
+      // Séparer verrouillés et non-verrouillés en gardant les positions originales
+      const lockedPositions = [];
+      const unlocked = [];
       sectorItems.forEach((d, idx) => {
-        if (!d.locked) {
-          const dist = haversine(prevEnd, d);
-          if (dist < closestDist) { closestDist = dist; closestIdx = idx; }
-        }
+        if (d.locked) lockedPositions.push({ d, idx });
+        else unlocked.push(d);
       });
-      if (!sectorItems[closestIdx].locked && closestIdx > 0) {
-        const [entry] = sectorItems.splice(closestIdx, 1);
-        sectorItems.unshift(entry);
-      }
 
-      const locked = sectorItems.filter(d => d.locked);
-      const unlocked = sectorItems.filter(d => !d.locked);
-      if (locked.length && unlocked.length) {
+      if (unlocked.length) {
         const optimizedUnlocked = await optimizeSegment(prevEnd, unlocked);
-        const result = [];
+        // Reconstruire : verrouillés à leur position, optimisés dans les trous
+        const result = new Array(sectorItems.length);
+        lockedPositions.forEach(lp => { result[lp.idx] = lp.d; });
         let ui = 0;
-        sectorItems.forEach(d => {
-          if (d.locked) result.push(d);
-          else if (ui < optimizedUnlocked.length) result.push(optimizedUnlocked[ui++]);
-        });
-        allOptimized.push(...result);
-      } else if (unlocked.length) {
-        allOptimized.push(...await optimizeSegment(prevEnd, unlocked));
+        for (let r = 0; r < result.length; r++) {
+          if (!result[r] && ui < optimizedUnlocked.length) result[r] = optimizedUnlocked[ui++];
+        }
+        allOptimized.push(...result.filter(Boolean));
       } else {
-        allOptimized.push(...locked);
+        allOptimized.push(...sectorItems);
       }
       prevEnd = allOptimized[allOptimized.length - 1];
     }
