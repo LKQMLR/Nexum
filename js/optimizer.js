@@ -124,34 +124,20 @@ async function optimizeRoute() {
     let prevEnd = state.startPoint;
     for (const s of sectorOrder) {
       const sectorItems = groups[s];
-      // Trouver le point d'entrée le plus proche du secteur précédent
-      let closestIdx = 0, closestDist = Infinity;
-      sectorItems.forEach((d, idx) => {
-        if (!d.locked) {
-          const dist = haversine(prevEnd, d);
-          if (dist < closestDist) { closestDist = dist; closestIdx = idx; }
-        }
-      });
-      if (!sectorItems[closestIdx].locked && closestIdx > 0) {
-        const [entry] = sectorItems.splice(closestIdx, 1);
-        sectorItems.unshift(entry);
-      }
-
-      const locked = sectorItems.filter(d => d.locked);
       const unlocked = sectorItems.filter(d => !d.locked);
-      if (locked.length && unlocked.length) {
+
+      if (unlocked.length) {
         const optimizedUnlocked = await optimizeSegment(prevEnd, unlocked);
-        const result = [];
+        // Reconstruire : locked gardent leur index, optimisés remplissent les trous
+        const result = new Array(sectorItems.length);
+        sectorItems.forEach((d, i) => { if (d.locked) result[i] = d; });
         let ui = 0;
-        sectorItems.forEach(d => {
-          if (d.locked) result.push(d);
-          else if (ui < optimizedUnlocked.length) result.push(optimizedUnlocked[ui++]);
-        });
-        allOptimized.push(...result);
-      } else if (unlocked.length) {
-        allOptimized.push(...await optimizeSegment(prevEnd, unlocked));
+        for (let i = 0; i < result.length; i++) {
+          if (!result[i] && ui < optimizedUnlocked.length) result[i] = optimizedUnlocked[ui++];
+        }
+        allOptimized.push(...result.filter(Boolean));
       } else {
-        allOptimized.push(...locked);
+        allOptimized.push(...sectorItems);
       }
       prevEnd = allOptimized[allOptimized.length - 1];
     }
@@ -162,19 +148,15 @@ async function optimizeRoute() {
     if (!hasLocked) {
       state.deliveries = await optimizeSegment(state.startPoint, state.deliveries);
     } else {
-      const locked = [], unlocked = [];
-      state.deliveries.forEach((d, i) => {
-        if (d.locked) locked.push({ d, i });
-        else unlocked.push(d);
-      });
+      const unlocked = state.deliveries.filter(d => !d.locked);
       const optimizedUnlocked = await optimizeSegment(state.startPoint, unlocked);
-      const result = [];
+      const result = new Array(state.deliveries.length);
+      state.deliveries.forEach((d, i) => { if (d.locked) result[i] = d; });
       let ui = 0;
-      state.deliveries.forEach(d => {
-        if (d.locked) result.push(d);
-        else if (ui < optimizedUnlocked.length) result.push(optimizedUnlocked[ui++]);
-      });
-      state.deliveries = result;
+      for (let i = 0; i < result.length; i++) {
+        if (!result[i] && ui < optimizedUnlocked.length) result[i] = optimizedUnlocked[ui++];
+      }
+      state.deliveries = result.filter(Boolean);
     }
   }
   state.deliveries.forEach(d => { if (!d.locked) d.customOrder = false; });
