@@ -24,27 +24,15 @@ function createClassicMarker(position, label, color, title, targetMap, scale) {
   const lineW = Math.round(2 * s);
   const tagX = (totalW - tagW) / 2;
   const shadowOff = Math.round(2 * s);
-
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${totalH}" viewBox="0 0 ${totalW} ${totalH}">
-    <defs>
-      <radialGradient id="${gid}" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="${color}"/>
-        <stop offset="70%" stop-color="${color}"/>
-        <stop offset="100%" stop-color="#0a0a1a"/>
-      </radialGradient>
-      <linearGradient id="${gid}l" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="${color}"/>
-        <stop offset="100%" stop-color="#0a0a1a"/>
-      </linearGradient>
-    </defs>
     <!-- Ombre portée -->
     <rect x="${tagX + shadowOff}" y="${shadowOff + 1}" width="${tagW}" height="${tagH}" rx="${tagR}" fill="rgba(0,0,0,.35)"/>
-    <!-- Étiquette avec dégradé -->
-    <rect x="${tagX}" y="0" width="${tagW}" height="${tagH}" rx="${tagR}" fill="url(#${gid})"/>
+    <!-- Étiquette avec contour noir -->
+    <rect x="${tagX}" y="0" width="${tagW}" height="${tagH}" rx="${tagR}" fill="${color}" stroke="#0a0a1a" stroke-width="${Math.round(2 * s)}"/>
     <!-- Numéro -->
     <text x="${cx}" y="${tagH / 2 + fontSize * 0.36}" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-weight="800" font-size="${fontSize}">${label}</text>
-    <!-- Trait dégradé -->
-    <line x1="${cx}" y1="${tagH}" x2="${cx}" y2="${tagH + lineH}" stroke="url(#${gid}l)" stroke-width="${lineW + Math.round(1 * s)}" stroke-linecap="round"/>
+    <!-- Trait -->
+    <line x1="${cx}" y1="${tagH}" x2="${cx}" y2="${tagH + lineH}" stroke="#0a0a1a" stroke-width="${lineW + Math.round(1 * s)}" stroke-linecap="round"/>
     <!-- Point -->
     <circle cx="${cx}" cy="${tagH + lineH}" r="${Math.round(3.5 * s)}" fill="#0a0a1a"/>
     <circle cx="${cx}" cy="${tagH + lineH}" r="${Math.round(1.5 * s)}" fill="${color}" opacity=".7"/>

@@ -235,6 +235,8 @@ function resetAll() {
   if (state.startPoint?.marker) { state.startPoint.marker.setMap(null); }
   if (state._routePoly) { state._routePoly.setMap(null); state._routePoly = null; }
   if (state._routePolyPreview) { state._routePolyPreview.setMap(null); state._routePolyPreview = null; }
+  if (state._routePolys) { state._routePolys.forEach(p => p.setMap(null)); state._routePolys = []; }
+  if (state._routePolysPreview) { state._routePolysPreview.forEach(p => p.setMap(null)); state._routePolysPreview = []; }
   if (state._completedPoly) { state._completedPoly.setMap(null); state._completedPoly = null; }
   state.startPoint = null;
   state.deliveries.forEach(d => { if (d.marker) d.marker.setMap(null); });

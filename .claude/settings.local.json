@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:nominatim.org)",
+      "WebFetch(domain:project-osrm.org)",
+      "WebFetch(domain:leafletjs.com)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(realpath $TEMP/LKQMLR.github.io/index.html)"
+    ]
+  }
+}

@@ -69,6 +69,33 @@
 }
 .nav-arrived { color: var(--green) !important; font-weight: 600; }
 
+/* ── LABEL STATUT LIVRAISON ── */
+.nav-status-label {
+  font-size: .62rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .6px; margin-bottom: 2px; line-height: 1;
+}
+.nav-status-label.blink {
+  color: #f59e0b;
+  animation: navBlink 1.5s ease-in-out infinite;
+}
+.nav-status-label.arrived {
+  color: var(--green); animation: none;
+}
+@keyframes navBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .3; }
+}
+
+/* ── BOUTON SUIVANT AVEC ADRESSE ── */
+#btn-nav-next {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.btn-next-addr {
+  font-size: .6rem; font-weight: 400; opacity: .7;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 100%;
+}
+
 /* ── ALERTE DE PROXIMITÉ ── */
 #proximity-alert {
   position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
