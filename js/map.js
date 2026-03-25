@@ -6,11 +6,10 @@
 // ── Compteur unique pour les dégradés SVG ──
 let _markerGradId = 0;
 
-// ── MARKER MODERNE : étiquette avec dégradé noir→couleur + trait ──
+// ── MARKER MODERNE : étiquette arrondie + trait + point ──
 function createClassicMarker(position, label, color, title, targetMap, scale) {
   const isStart = label === 'D';
   const s = scale || 1;
-  const gid = 'mg' + (++_markerGradId);
 
   // Dimensions
   const fontSize = Math.round((label.length > 2 ? 11 : label.length > 1 ? 12 : 14) * s);
@@ -20,22 +19,24 @@ function createClassicMarker(position, label, color, title, targetMap, scale) {
   const tagW = Math.round((label.length > 2 ? 42 : label.length > 1 ? 34 : 30) * s);
   const totalW = tagW + Math.round(8 * s);
   const cx = totalW / 2;
-  const tagR = Math.round(4 * s);
+  const tagR = Math.round(6 * s);
   const lineW = Math.round(2 * s);
   const tagX = (totalW - tagW) / 2;
   const shadowOff = Math.round(2 * s);
+  const sw = Math.round(2 * s);
+
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${totalH}" viewBox="0 0 ${totalW} ${totalH}">
     <!-- Ombre portée -->
     <rect x="${tagX + shadowOff}" y="${shadowOff + 1}" width="${tagW}" height="${tagH}" rx="${tagR}" fill="rgba(0,0,0,.35)"/>
-    <!-- Étiquette avec contour noir -->
-    <rect x="${tagX}" y="0" width="${tagW}" height="${tagH}" rx="${tagR}" fill="${color}" stroke="#0a0a1a" stroke-width="${Math.round(2 * s)}"/>
+    <!-- Étiquette avec contour blanc -->
+    <rect x="${tagX}" y="0" width="${tagW}" height="${tagH}" rx="${tagR}" fill="${color}" stroke="#fff" stroke-width="${sw}"/>
     <!-- Numéro -->
     <text x="${cx}" y="${tagH / 2 + fontSize * 0.36}" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-weight="800" font-size="${fontSize}">${label}</text>
     <!-- Trait -->
-    <line x1="${cx}" y1="${tagH}" x2="${cx}" y2="${tagH + lineH}" stroke="#0a0a1a" stroke-width="${lineW + Math.round(1 * s)}" stroke-linecap="round"/>
+    <line x1="${cx}" y1="${tagH}" x2="${cx}" y2="${tagH + lineH}" stroke="${color}" stroke-width="${lineW + Math.round(1 * s)}" stroke-linecap="round"/>
     <!-- Point -->
-    <circle cx="${cx}" cy="${tagH + lineH}" r="${Math.round(3.5 * s)}" fill="#0a0a1a"/>
-    <circle cx="${cx}" cy="${tagH + lineH}" r="${Math.round(1.5 * s)}" fill="${color}" opacity=".7"/>
+    <circle cx="${cx}" cy="${tagH + lineH}" r="${Math.round(3.5 * s)}" fill="#fff"/>
+    <circle cx="${cx}" cy="${tagH + lineH}" r="${Math.round(1.5 * s)}" fill="${color}"/>
   </svg>`;
 
   return new google.maps.Marker({

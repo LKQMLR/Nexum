@@ -48,37 +48,23 @@ function displayRoute(stops) {
         allLegs.push(...legs);
       });
 
-      // Affichage sur la carte — polylines colorées par secteur
+      // Affichage sur la carte — toujours en polyline custom (pas de markers Google)
       state.directionsRenderer.setDirections({ routes: [] });
       if (state.previewRenderer) state.previewRenderer.setDirections({ routes: [] });
-      if (state._routePolys) state._routePolys.forEach(p => p.setMap(null));
-      if (state._routePolysPreview) state._routePolysPreview.forEach(p => p.setMap(null));
-      if (state._routePoly) { state._routePoly.setMap(null); state._routePoly = null; }
-      if (state._routePolyPreview) { state._routePolyPreview.setMap(null); state._routePolyPreview = null; }
-      state._routePolys = [];
-      state._routePolysPreview = [];
+      const path = [];
+      allResults.forEach(r => { r.routes[0].overview_path.forEach(p => path.push(p)); });
+      if (state._routePoly) state._routePoly.setMap(null);
+      if (state._routePolyPreview) state._routePolyPreview.setMap(null);
       const arrowIcon = { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW, scale: 2.5, strokeColor: '#fff', strokeWeight: 1, fillColor: '#fff', fillOpacity: 0.9 };
-
-      // Dessiner un segment par leg avec la couleur du secteur de destination
-      let legIdx = 0;
-      allResults.forEach(r => {
-        r.routes[0].legs.forEach(leg => {
-          const destStop = stops[legIdx + 1];
-          const segColor = destStop ? (SECTOR_COLS[destStop.sector || 0] || '#4f8cff') : '#4f8cff';
-          const legPath = [];
-          leg.steps.forEach(step => step.path.forEach(p => legPath.push(p)));
-          state._routePolys.push(new google.maps.Polyline({
-            path: legPath, map: state.map, strokeColor: segColor, strokeWeight: 5, strokeOpacity: 0.9,
-            icons: [{ icon: arrowIcon, offset: '0', repeat: '80px' }]
-          }));
-          if (state.previewMap) {
-            state._routePolysPreview.push(new google.maps.Polyline({
-              path: legPath, map: state.previewMap, strokeColor: segColor, strokeWeight: 3, strokeOpacity: 0.9
-            }));
-          }
-          legIdx++;
-        });
+      state._routePoly = new google.maps.Polyline({
+        path, map: state.map, strokeColor: '#4f8cff', strokeWeight: 5, strokeOpacity: 0.9,
+        icons: [{ icon: arrowIcon, offset: '0', repeat: '80px' }]
       });
+      if (state.previewMap) {
+        state._routePolyPreview = new google.maps.Polyline({
+          path, map: state.previewMap, strokeColor: '#4f8cff', strokeWeight: 3, strokeOpacity: 0.9
+        });
+      }
 
       // Placer les markers
       stops.forEach((s, r) => {

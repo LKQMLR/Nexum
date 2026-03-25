@@ -65,8 +65,6 @@ function updateGPSPosition(coords) {
     if (dist < 80) {
       meta.textContent = 'Vous êtes arrivé !';
       meta.classList.add('nav-arrived');
-      const statusEl = document.getElementById('nav-status-label');
-      if (statusEl) { statusEl.textContent = 'Trajet terminé ✓'; statusEl.className = 'nav-status-label arrived'; }
       if (_simMode && !state._simAutoAdvancing) {
         state._simAutoAdvancing = true;
         setTimeout(() => { state._simAutoAdvancing = false; nextNavStop(); }, 1500);
@@ -137,24 +135,12 @@ function updateNavPanel() {
   const i = state.navIndex, total = state.deliveries.length;
   const stop = state.navStops[i + 1], leg = state.navLegs[i];
   document.getElementById('nav-badge').textContent = i + 1;
-  document.getElementById('nav-dest').textContent = stop.placeName || stop.formatted;
+  document.getElementById('nav-dest').textContent = stop.formatted;
   document.getElementById('nav-meta').textContent = leg.distance.text + ' · ' + leg.duration.text;
   document.getElementById('nav-meta').classList.remove('nav-arrived');
-  // Label "en cours de livraison" clignotant
-  const statusEl = document.getElementById('nav-status-label');
-  if (statusEl) { statusEl.textContent = 'En cours de livraison'; statusEl.className = 'nav-status-label blink'; }
   document.getElementById('nav-progress-text').textContent = (i + 1) + ' / ' + total;
   document.getElementById('nav-progress-fill').style.width = ((i + 1) / total * 100) + '%';
-  // Bouton suivant avec prochaine adresse
-  const btnNext = document.getElementById('btn-nav-next');
-  if (i < total - 1) {
-    const nextStop = state.navStops[i + 2];
-    const nextLabel = nextStop.placeName || nextStop.formatted;
-    const short = nextLabel.length > 25 ? nextLabel.substring(0, 25) + '…' : nextLabel;
-    btnNext.innerHTML = 'Suivant ▸<span class="btn-next-addr">' + short + '</span>';
-  } else {
-    btnNext.innerHTML = 'Terminé ✓';
-  }
+  document.getElementById('btn-nav-next').textContent = i < total - 1 ? 'Suivant ▸' : 'Terminé ✓';
   // Animation du marker de destination
   state.markers.forEach((m, idx) => m.setAnimation(idx === i + 1 ? google.maps.Animation.BOUNCE : null));
   setTimeout(() => state.markers.forEach(m => m.setAnimation(null)), 1500);
