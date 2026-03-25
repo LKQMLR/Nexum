@@ -109,55 +109,46 @@ async function optimizeRoute() {
   const originalOrder = [...state.deliveries];
   const hasSectors = state.deliveries.some(d => d.sector);
 
-  if (hasSectors) {
-    // Optimisation par secteur
-    const groups = {};
-    state.deliveries.forEach(d => {
-      const s = d.sector || 0;
-      if (!groups[s]) groups[s] = [];
-      groups[s].push(d);
-    });
-    const sectorOrder = [1, 2, 3, 4, 5].filter(s => groups[s]);
-    if (groups[0]) sectorOrder.push(0); // Sans secteur en dernier
+  // 1. Séparer les lockés (position globale fixe) et les non-lockés
+  const locked = [];
+  const unlocked = [];
+  state.deliveries.forEach((d, i) => {
+    if (d.locked) locked.push({ d, idx: i });
+    else unlocked.push(d);
+  });
 
-    let allOptimized = [];
-    let prevEnd = state.startPoint;
-    for (const s of sectorOrder) {
-      const sectorItems = groups[s];
-      const unlocked = sectorItems.filter(d => !d.locked);
+  if (unlocked.length) {
+    // 2. Optimiser les non-lockés par secteur
+    let optimizedUnlocked;
+    if (hasSectors) {
+      const groups = {};
+      unlocked.forEach(d => {
+        const s = d.sector || 0;
+        if (!groups[s]) groups[s] = [];
+        groups[s].push(d);
+      });
+      const sectorOrder = [1, 2, 3, 4, 5].filter(s => groups[s]);
+      if (groups[0]) sectorOrder.push(0);
 
-      if (unlocked.length) {
-        const optimizedUnlocked = await optimizeSegment(prevEnd, unlocked);
-        // Reconstruire : locked gardent leur index, optimisés remplissent les trous
-        const result = new Array(sectorItems.length);
-        sectorItems.forEach((d, i) => { if (d.locked) result[i] = d; });
-        let ui = 0;
-        for (let i = 0; i < result.length; i++) {
-          if (!result[i] && ui < optimizedUnlocked.length) result[i] = optimizedUnlocked[ui++];
-        }
-        allOptimized.push(...result.filter(Boolean));
-      } else {
-        allOptimized.push(...sectorItems);
+      optimizedUnlocked = [];
+      let prevEnd = state.startPoint;
+      for (const s of sectorOrder) {
+        const opt = await optimizeSegment(prevEnd, groups[s]);
+        optimizedUnlocked.push(...opt);
+        prevEnd = opt[opt.length - 1];
       }
-      prevEnd = allOptimized[allOptimized.length - 1];
-    }
-    state.deliveries = allOptimized;
-  } else {
-    // Optimisation simple (sans secteurs)
-    const hasLocked = state.deliveries.some(d => d.locked);
-    if (!hasLocked) {
-      state.deliveries = await optimizeSegment(state.startPoint, state.deliveries);
     } else {
-      const unlocked = state.deliveries.filter(d => !d.locked);
-      const optimizedUnlocked = await optimizeSegment(state.startPoint, unlocked);
-      const result = new Array(state.deliveries.length);
-      state.deliveries.forEach((d, i) => { if (d.locked) result[i] = d; });
-      let ui = 0;
-      for (let i = 0; i < result.length; i++) {
-        if (!result[i] && ui < optimizedUnlocked.length) result[i] = optimizedUnlocked[ui++];
-      }
-      state.deliveries = result.filter(Boolean);
+      optimizedUnlocked = await optimizeSegment(state.startPoint, unlocked);
     }
+
+    // 3. Reconstruire : lockés à leur position globale, optimisés dans les trous
+    const result = new Array(state.deliveries.length);
+    locked.forEach(lp => { result[lp.idx] = lp.d; });
+    let ui = 0;
+    for (let i = 0; i < result.length; i++) {
+      if (!result[i] && ui < optimizedUnlocked.length) result[i] = optimizedUnlocked[ui++];
+    }
+    state.deliveries = result.filter(Boolean);
   }
   state.deliveries.forEach(d => { if (!d.locked) d.customOrder = false; });
   state._originalOrder = originalOrder;
