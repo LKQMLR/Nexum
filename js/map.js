@@ -15,30 +15,33 @@ function createClassicMarker(position, label, color, title, targetMap, scale) {
   const fontSize = Math.round((label.length > 2 ? 12 : label.length > 1 ? 14 : 16) * s);
   const tagH = Math.round(32 * s);
   const lineH = Math.round(16 * s);
-  const totalH = tagH + lineH + Math.round(4 * s);
   const tagW = Math.round((label.length > 2 ? 46 : label.length > 1 ? 38 : 34) * s);
-  const totalW = tagW + Math.round(10 * s);
-  const cx = totalW / 2;
   const tagR = Math.round(6 * s);
   const lineW = Math.round(2 * s);
+  const sw = Math.round(3.5 * s);
+  const outerSw = sw + Math.round(2 * s);
+  const pad = Math.ceil(outerSw / 2) + 1; // padding pour ne pas couper le stroke
+  const totalW = tagW + Math.round(10 * s) + pad * 2;
+  const totalH = tagH + lineH + Math.round(4 * s) + pad;
+  const cx = totalW / 2;
   const tagX = (totalW - tagW) / 2;
   const shadowOff = Math.round(3 * s);
-  const sw = Math.round(3.5 * s);
+  const ty = pad; // décalage vertical pour laisser la place au stroke
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${totalH}" viewBox="0 0 ${totalW} ${totalH}">
     <!-- Ombre portée -->
-    <rect x="${tagX + shadowOff}" y="${shadowOff + 1}" width="${tagW}" height="${tagH}" rx="${tagR}" fill="rgba(0,0,0,.35)"/>
+    <rect x="${tagX + shadowOff}" y="${ty + shadowOff + 1}" width="${tagW}" height="${tagH}" rx="${tagR}" fill="rgba(0,0,0,.35)"/>
     <!-- Contour extérieur couleur secteur -->
-    <rect x="${tagX}" y="0" width="${tagW}" height="${tagH}" rx="${tagR}" fill="none" stroke="${color}" stroke-width="${sw + Math.round(2 * s)}"/>
+    <rect x="${tagX}" y="${ty}" width="${tagW}" height="${tagH}" rx="${tagR}" fill="none" stroke="${color}" stroke-width="${outerSw}"/>
     <!-- Étiquette avec contour blanc -->
-    <rect x="${tagX}" y="0" width="${tagW}" height="${tagH}" rx="${tagR}" fill="${color}" stroke="#fff" stroke-width="${sw}"/>
+    <rect x="${tagX}" y="${ty}" width="${tagW}" height="${tagH}" rx="${tagR}" fill="${color}" stroke="#fff" stroke-width="${sw}"/>
     <!-- Numéro -->
-    <text x="${cx}" y="${tagH / 2 + fontSize * 0.36}" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-weight="800" font-size="${fontSize}">${label}</text>
+    <text x="${cx}" y="${ty + tagH / 2 + fontSize * 0.36}" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-weight="800" font-size="${fontSize}">${label}</text>
     <!-- Trait -->
-    <line x1="${cx}" y1="${tagH}" x2="${cx}" y2="${tagH + lineH}" stroke="${color}" stroke-width="${lineW + Math.round(1 * s)}" stroke-linecap="round"/>
+    <line x1="${cx}" y1="${ty + tagH}" x2="${cx}" y2="${ty + tagH + lineH}" stroke="${color}" stroke-width="${lineW + Math.round(1 * s)}" stroke-linecap="round"/>
     <!-- Point -->
-    <circle cx="${cx}" cy="${tagH + lineH}" r="${Math.round(3.5 * s)}" fill="#fff"/>
-    <circle cx="${cx}" cy="${tagH + lineH}" r="${Math.round(1.5 * s)}" fill="${color}"/>
+    <circle cx="${cx}" cy="${ty + tagH + lineH}" r="${Math.round(3.5 * s)}" fill="#fff"/>
+    <circle cx="${cx}" cy="${ty + tagH + lineH}" r="${Math.round(1.5 * s)}" fill="${color}"/>
   </svg>`;
 
   return new google.maps.Marker({
@@ -46,7 +49,7 @@ function createClassicMarker(position, label, color, title, targetMap, scale) {
     icon: {
       url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
       scaledSize: new google.maps.Size(totalW, totalH),
-      anchor: new google.maps.Point(cx, tagH + lineH)
+      anchor: new google.maps.Point(cx, ty + tagH + lineH)
     },
     zIndex: isStart ? 1000 : 500
   });
