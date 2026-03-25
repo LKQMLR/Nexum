@@ -312,9 +312,12 @@ async function managePremium() {
     showStatus('error', 'Aucun email associé au premium');
     return;
   }
-  // Les emails owner n'ont pas de portail Stripe
+  // Les emails owner : toggle premium on/off
   if (await isOwnerEmail(email)) {
-    showStatus('success', 'Compte propri\u00e9taire — Premium permanent.');
+    localStorage.removeItem('cargo_premium_email');
+    _premiumVerified = false;
+    applyPremium(false);
+    showStatus('success', 'Premium d\u00e9sactiv\u00e9. Cliquez sur "Passer Premium" pour r\u00e9activer.');
     return;
   }
   try {
