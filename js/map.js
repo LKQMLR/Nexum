@@ -23,7 +23,7 @@ function createClassicMarker(position, label, color, title, targetMap, scale) {
   const lineW = Math.round(2 * s);
   const tagX = (totalW - tagW) / 2;
   const shadowOff = Math.round(2 * s);
-  const sw = Math.round(2 * s);
+  const sw = Math.round(3.5 * s);
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${totalH}" viewBox="0 0 ${totalW} ${totalH}">
     <!-- Ombre portée -->
