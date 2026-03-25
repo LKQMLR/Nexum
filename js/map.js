@@ -18,9 +18,9 @@ function createClassicMarker(position, label, color, title, targetMap, scale) {
   const tagW = Math.round((label.length > 2 ? 46 : label.length > 1 ? 38 : 34) * s);
   const tagR = Math.round(6 * s);
   const lineW = Math.round(2 * s);
-  const sw = Math.round(3.5 * s);
-  const outerSw = sw + Math.round(2 * s);
-  const pad = Math.ceil(outerSw / 2) + 1; // padding pour ne pas couper le stroke
+  const sw = Math.round(2.5 * s);
+  const outerSw = sw + Math.round(4 * s);
+  const pad = Math.ceil(outerSw / 2) + 1;
   const totalW = tagW + Math.round(10 * s) + pad * 2;
   const totalH = tagH + lineH + Math.round(4 * s) + pad;
   const cx = totalW / 2;
