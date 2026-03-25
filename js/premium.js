@@ -312,6 +312,11 @@ async function managePremium() {
     showStatus('error', 'Aucun email associé au premium');
     return;
   }
+  // Les emails owner n'ont pas de portail Stripe
+  if (await isOwnerEmail(email)) {
+    showStatus('success', 'Compte propri\u00e9taire — Premium permanent.');
+    return;
+  }
   try {
     const res = await fetch(`${CARGO_API}/api/customer-portal`, {
       method: 'POST',
