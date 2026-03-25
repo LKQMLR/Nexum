@@ -25,18 +25,17 @@ function createClassicMarker(position, label, color, title, targetMap, scale) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${totalH}" viewBox="0 0 ${totalW} ${totalH}">
     <!-- Ombre portée -->
     <rect x="${tagX + shadowOff}" y="${shadowOff + 1}" width="${tagW}" height="${tagH}" rx="${tagR}" fill="rgba(0,0,0,.35)"/>
-    <!-- Contour blanc -->
-    <rect x="${tagX}" y="0" width="${tagW}" height="${tagH}" rx="${tagR}" fill="#fff"/>
+    <!-- Contour noir -->
+    <rect x="${tagX}" y="0" width="${tagW}" height="${tagH}" rx="${tagR}" fill="#1a1a2e" stroke="#1a1a2e" stroke-width="1"/>
     <!-- Étiquette couleur -->
     <rect x="${tagX + borderW}" y="${borderW}" width="${tagW - borderW * 2}" height="${tagH - borderW * 2}" rx="${tagR - 1}" fill="${color}"/>
     <!-- Numéro -->
     <text x="${cx}" y="${tagH / 2 + fontSize * 0.36}" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-weight="800" font-size="${fontSize}">${label}</text>
-    <!-- Trait avec contour -->
-    <line x1="${cx}" y1="${tagH}" x2="${cx}" y2="${tagH + lineH}" stroke="#fff" stroke-width="${lineW + Math.round(2 * s)}" stroke-linecap="round"/>
-    <line x1="${cx}" y1="${tagH}" x2="${cx}" y2="${tagH + lineH}" stroke="${color}" stroke-width="${lineW}" stroke-linecap="round"/>
-    <!-- Point avec contour -->
-    <circle cx="${cx}" cy="${tagH + lineH}" r="${Math.round(4 * s)}" fill="#fff"/>
-    <circle cx="${cx}" cy="${tagH + lineH}" r="${Math.round(2.5 * s)}" fill="${color}"/>
+    <!-- Trait noir -->
+    <line x1="${cx}" y1="${tagH}" x2="${cx}" y2="${tagH + lineH}" stroke="#1a1a2e" stroke-width="${lineW + Math.round(1 * s)}" stroke-linecap="round"/>
+    <!-- Point noir -->
+    <circle cx="${cx}" cy="${tagH + lineH}" r="${Math.round(3.5 * s)}" fill="#1a1a2e"/>
+    <circle cx="${cx}" cy="${tagH + lineH}" r="${Math.round(1.5 * s)}" fill="${color}"/>
   </svg>`;
 
   return new google.maps.Marker({
