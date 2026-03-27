@@ -134,6 +134,7 @@ function saveSession() {
       idCounter: idCounter,
     };
     localStorage.setItem('cargo_session', JSON.stringify(data));
+    console.log('[CarGo] Session sauvegardée:', data.deliveries.length, 'adresses');
   } catch (e) {
     console.error('Erreur sauvegarde session:', e);
   }
@@ -141,7 +142,10 @@ function saveSession() {
 
 function restoreSession() {
   try {
-    const data = JSON.parse(localStorage.getItem('cargo_session'));
+    const raw = localStorage.getItem('cargo_session');
+    if (!raw) { console.log('[CarGo] Aucune session sauvegardée'); return; }
+    const data = JSON.parse(raw);
+    console.log('[CarGo] Restauration session:', data.deliveries?.length || 0, 'adresses');
     if (!data || (!data.startPoint && !data.deliveries.length)) {
       // Pas de session mais peut-être un point de départ sauvegardé
       const sp = localStorage.getItem('cargo_startPoint');
