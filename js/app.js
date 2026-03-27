@@ -119,20 +119,24 @@ function initApp() {
 
 // ── SESSION PERSISTENCE ──
 function saveSession() {
-  const data = {
-    startPoint: state.startPoint ? { address: state.startPoint.address, lat: state.startPoint.lat, lng: state.startPoint.lng, formatted: state.startPoint.formatted } : null,
-    deliveries: state.deliveries.map(d => ({
-      id: d.id, address: d.address, lat: d.lat, lng: d.lng, formatted: d.formatted,
-      placeName: d.placeName || '', note: d.note || '',
-      legDist: d.legDist || '', legDur: d.legDur || '',
-      locked: d.locked || false, customOrder: d.customOrder || false, sector: d.sector || 0
-    })),
-    routeOptimized: !!state.navStops,
-    navActive: !!document.getElementById('nav-panel').classList.contains('visible'),
-    navIndex: state.navIndex,
-    idCounter: idCounter,
-  };
-  localStorage.setItem('cargo_session', JSON.stringify(data));
+  try {
+    const data = {
+      startPoint: state.startPoint ? { address: state.startPoint.address, lat: state.startPoint.lat, lng: state.startPoint.lng, formatted: state.startPoint.formatted } : null,
+      deliveries: state.deliveries.map(d => ({
+        id: d.id, address: d.address, lat: d.lat, lng: d.lng, formatted: d.formatted,
+        placeName: d.placeName || '', note: d.note || '',
+        legDist: d.legDist || '', legDur: d.legDur || '',
+        locked: d.locked || false, customOrder: d.customOrder || false, sector: d.sector || 0
+      })),
+      routeOptimized: !!state.navStops,
+      navActive: !!document.getElementById('nav-panel').classList.contains('visible'),
+      navIndex: state.navIndex,
+      idCounter: idCounter,
+    };
+    localStorage.setItem('cargo_session', JSON.stringify(data));
+  } catch (e) {
+    console.error('Erreur sauvegarde session:', e);
+  }
 }
 
 function restoreSession() {
