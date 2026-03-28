@@ -29,10 +29,13 @@
 <!-- Pull-to-refresh indicator -->
 <div id="ptr-indicator"><span id="ptr-label">Actualiser ?</span></div>
 
+<!-- Tooltip partagé (position:fixed, hors sidebar pour éviter le clipping) -->
+<div id="panel-tooltip" style="display:none;position:fixed;z-index:10010;width:220px;padding:10px 12px;background:var(--surface2,#1e2535);border:1px solid var(--border,#2a3a5c);border-radius:10px;font-size:.7rem;font-weight:400;color:var(--text,#e2e8f0);line-height:1.45;box-shadow:0 4px 20px rgba(0,0,0,.55);pointer-events:none;"></div>
+
 <!-- ══════════════ SIDEBAR ══════════════ -->
 <div id="sidebar">
   <div class="sidebar-header">
-    <h1>CarGo <span id="premium-badge"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="#fbbf24" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> PRO</span> <span id="version-tag" style="font-size:.5rem;font-weight:400;opacity:.5;vertical-align:middle;cursor:pointer" onclick="toggleSimMode()">v137</span></h1>
+    <h1>CarGo <span id="premium-badge"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="#fbbf24" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> PRO</span> <span id="version-tag" style="font-size:.5rem;font-weight:400;opacity:.5;vertical-align:middle;cursor:pointer" onclick="toggleSimMode()">v138</span></h1>
     <p>Planification intelligente de tournées</p>
   </div>
   <div class="sidebar-body">
@@ -48,7 +51,7 @@
       <div class="section section-start">
         <div class="section-title">
           Votre base
-          <span class="help-btn" style="position:relative;" ontouchstart="this.querySelector('.prox-tooltip').classList.add('show')" ontouchend="this.querySelector('.prox-tooltip').classList.remove('show')" ontouchcancel="this.querySelector('.prox-tooltip').classList.remove('show')" onmousedown="this.querySelector('.prox-tooltip').classList.add('show')" onmouseup="this.querySelector('.prox-tooltip').classList.remove('show')" onmouseleave="this.querySelector('.prox-tooltip').classList.remove('show')">?<span class="prox-tooltip" style="display:none;position:absolute;bottom:calc(100% + 8px);right:0;width:220px;padding:10px 12px;background:var(--surface2,#232340);border:1px solid var(--border);border-radius:10px;font-size:.7rem;font-weight:400;color:var(--text);line-height:1.4;text-align:left;box-shadow:0 4px 16px rgba(0,0,0,.4);z-index:100;">Entrepôt, dépôt ou domicile. CarGo calcule l'itinéraire optimal depuis ce point.</span></span>
+          <span class="help-btn" ontouchstart="showPanelTip(this,'Entrepôt, dépôt ou domicile. CarGo calcule l\'itinéraire optimal depuis ce point.')" ontouchend="hidePanelTip()" ontouchcancel="hidePanelTip()" onmousedown="showPanelTip(this,'Entrepôt, dépôt ou domicile. CarGo calcule l\'itinéraire optimal depuis ce point.')" onmouseup="hidePanelTip()" onmouseleave="hidePanelTip()">?</span>
         </div>
         <div class="input-wrapper">
           <input type="text" id="start-input" placeholder="Adresse de départ..." autocomplete="off" />
@@ -65,7 +68,7 @@
       <div class="section section-deliveries">
         <div class="section-title">
           Adresses de livraison <span id="delivery-count"></span>
-          <span class="help-btn" style="position:relative;" ontouchstart="this.querySelector('.prox-tooltip').classList.add('show')" ontouchend="this.querySelector('.prox-tooltip').classList.remove('show')" ontouchcancel="this.querySelector('.prox-tooltip').classList.remove('show')" onmousedown="this.querySelector('.prox-tooltip').classList.add('show')" onmouseup="this.querySelector('.prox-tooltip').classList.remove('show')" onmouseleave="this.querySelector('.prox-tooltip').classList.remove('show')">?<span class="prox-tooltip" style="display:none;position:absolute;top:calc(100% + 8px);right:0;width:230px;padding:10px 12px;background:var(--surface2,#232340);border:1px solid var(--border);border-radius:10px;font-size:.7rem;font-weight:400;color:var(--text);line-height:1.55;text-align:left;box-shadow:0 4px 16px rgba(0,0,0,.4);z-index:100;">↕ Glisser-déposer pour réordonner · Double-tap pour changer de secteur (Premium) · 🔒 Cadenas pour figer une position dans l'itinéraire</span></span>
+          <span class="help-btn" ontouchstart="showPanelTip(this,'↕ Glisser-déposer pour réordonner · Double-tap pour changer de secteur (Premium) · 🔒 Cadenas pour figer une position dans l\'itinéraire')" ontouchend="hidePanelTip()" ontouchcancel="hidePanelTip()" onmousedown="showPanelTip(this,'↕ Glisser-déposer pour réordonner · Double-tap pour changer de secteur (Premium) · 🔒 Cadenas pour figer une position dans l\'itinéraire')" onmouseup="hidePanelTip()" onmouseleave="hidePanelTip()">?</span>
         </div>
         <ul id="delivery-list"></ul>
         <div class="input-row">

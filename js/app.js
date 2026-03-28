@@ -254,6 +254,23 @@ function setUIBusy(b) {
   });
 }
 
+// ── TOOLTIP PANEL (position:fixed, hors contexte de clipping) ──
+function showPanelTip(el, text) {
+  const tip = document.getElementById('panel-tooltip');
+  tip.textContent = text;
+  tip.style.display = 'block';
+  const r = el.getBoundingClientRect();
+  const tipW = 220;
+  let left = r.right - tipW;
+  if (left < 8) left = 8;
+  const top = r.bottom + 8;
+  tip.style.left = left + 'px';
+  tip.style.top = top + 'px';
+}
+function hidePanelTip() {
+  document.getElementById('panel-tooltip').style.display = 'none';
+}
+
 // ── CONFIRM CUSTOM (remplace window.confirm) ──
 function showConfirm(msg) {
   return new Promise(resolve => {
