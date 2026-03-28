@@ -35,7 +35,18 @@
 .section-title {
   font-size: .68rem; font-weight: 700; text-transform: uppercase;
   letter-spacing: .8px; color: var(--text2); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
 }
+.section-title .help-btn { margin-left: auto; flex-shrink: 0; text-transform: none; letter-spacing: 0; }
+
+/* ── INFO-BULLE PANEL ── */
+.panel-tip {
+  display: none; font-size: .72rem; color: var(--text2); line-height: 1.65;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 12px; margin-bottom: 8px;
+}
+.panel-tip.visible { display: block; }
+.panel-tip b { color: var(--text); font-weight: 600; }
 
 /* Point de départ — discret, en retrait */
 .section-start {
