@@ -70,11 +70,16 @@ function canUseProximityAlerts() {
   return isPremium() || FREE_LIMITS.proximityAlerts;
 }
 
+let _lastLimitAlert = 0;
 function showLimitAlert(_, message) {
+  const now = Date.now();
+  if (now - _lastLimitAlert < 2000) return; // Anti-spam
+  _lastLimitAlert = now;
   showStatus('error', message + ' Passez Premium !');
-  // Clignoter le bouton premium
   const btn = document.getElementById('btn-premium');
   if (btn) {
+    btn.classList.remove('premium-pulse');
+    void btn.offsetWidth; // Force reflow pour relancer l'animation
     btn.classList.add('premium-pulse');
     setTimeout(() => btn.classList.remove('premium-pulse'), 2000);
   }

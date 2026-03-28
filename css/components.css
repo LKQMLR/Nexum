@@ -3,6 +3,9 @@
    Boutons, inputs, cards, badges, secteurs
    ══════════════════════════════════════════ */
 
+/* ── Anti double-tap zoom + zones tactiles ── */
+button, input, label { touch-action: manipulation; }
+
 /* ── API STATUS ── */
 .api-status-dot {
   width: 6px; height: 6px; border-radius: 50%;
@@ -43,14 +46,28 @@ button:not(:disabled):hover { opacity: .85; transform: translateY(-1px); }
 }
 .btn-del:hover { background: var(--red-bg); }
 
+/* ── LIGNE SECTEUR + OPTIMISER ── */
+.sector-optimize-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.sector-optimize-row #btn-sector {
+  flex: 1;
+  margin-top: 0;
+}
+.sector-optimize-row #btn-optimize {
+  flex: 1;
+  margin-top: 0;
+}
+
 /* ── BOUTON OPTIMISER ── */
 #btn-optimize {
   background: linear-gradient(135deg, #fef3c7, #facc15, #eab308);
-  color: #1a1a2e; width: 100%; padding: 14px; font-size: .95rem; font-weight: 700;
+  color: #1a1a2e; width: 100%; padding: 14px; font-size: .85rem; font-weight: 700;
   border-radius: var(--radius); letter-spacing: .3px;
   border: 1px solid rgba(250,204,21,.6);
   text-transform: uppercase;
-  margin-top: 16px;
 }
 #btn-optimize:not(:disabled):hover { border-color: rgba(250,220,80,.8); }
 

@@ -301,5 +301,17 @@ async function clearCacheAndData() {
   location.reload(true);
 }
 
+// ── SAUVEGARDE À LA FERMETURE ──
+// Sauvegarde quand l'app perd le focus, est mise en arrière-plan ou fermée
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden' && state.deliveries.length) saveSession();
+});
+window.addEventListener('pagehide', () => {
+  if (state.deliveries.length) saveSession();
+});
+window.addEventListener('beforeunload', () => {
+  if (state.deliveries.length) saveSession();
+});
+
 // Service Worker
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
