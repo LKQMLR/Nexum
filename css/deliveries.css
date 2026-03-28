@@ -39,20 +39,27 @@
 #delivery-list li.swiping { transition: transform .2s ease-out, opacity .2s; }
 #delivery-list li.swipe-out { transform: translateX(-100%); opacity: 0; }
 
-/* ── BOUTON SUPPRIMER (visible au swipe ou long-press) ── */
+/* ── BOUTON SUPPRIMER (révélé au swipe) ── */
 .delivery-delete {
-  position: absolute; right: -48px; top: 0; bottom: 0;
-  width: 48px; display: flex; align-items: center; justify-content: center;
-  background: var(--red); color: #fff; border: none; cursor: pointer;
-  border-radius: 0 10px 10px 0; font-size: 1.1rem;
+  position: absolute; right: -56px; top: 0; bottom: 0;
+  width: 56px; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: #fff; border: none; cursor: pointer;
+  border-radius: 0 10px 10px 0; font-size: .7rem; font-weight: 600;
+  letter-spacing: .3px; text-transform: uppercase;
   opacity: 0; transition: opacity .2s, right .2s;
-  z-index: 2;
+  z-index: 2; gap: 2px; flex-direction: column;
+  box-shadow: inset -2px 0 8px rgba(0,0,0,.2);
+}
+.delivery-delete svg {
+  width: 18px; height: 18px; stroke: #fff; stroke-width: 2;
+  fill: none; flex-shrink: 0;
 }
 #delivery-list li.swipe-reveal .delivery-delete {
   right: 0; opacity: 1;
 }
 #delivery-list li.swipe-reveal {
-  transform: translateX(-48px);
+  transform: translateX(-56px);
   transition: transform .2s ease-out;
 }
 
@@ -105,19 +112,20 @@
 /* ── GHOST (clone visible pendant le drag) ── */
 .drag-ghost {
   position: fixed; z-index: 99999; pointer-events: none;
-  background: var(--surface2); border: 1.5px solid var(--accent);
-  border-radius: 8px; padding: 8px 12px;
-  display: flex; align-items: center; gap: 8px;
-  font-size: .8rem; color: var(--text);
-  opacity: .88; box-shadow: 0 8px 24px rgba(0,0,0,.5);
-  transform: rotate(1.5deg);
-  max-width: 340px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  background: var(--card); border: 1.5px solid var(--accent);
+  border-radius: 10px; padding: 12px 14px 12px 10px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: .78rem; color: var(--text);
+  opacity: .92; box-shadow: 0 8px 28px rgba(0,0,0,.55), 0 0 0 1px rgba(99,144,255,.15);
+  width: calc(100vw - 48px); max-width: 380px;
+  line-height: 1.35; word-break: break-word;
 }
 .drag-ghost .delivery-num {
   background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: #fff; border-radius: 5px;
+  color: #fff; border-radius: 50%;
   min-width: 22px; height: 22px; font-size: .65rem; font-weight: 700;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(99,144,255,.35);
 }
 
 /* ── COULEURS PAR SECTEUR (bordure gauche) ── */

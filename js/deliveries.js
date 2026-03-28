@@ -164,7 +164,7 @@ function renderDeliveryList() {
           onblur="saveNote(${d.id}, this.value)" data-id="${d.id}" />${legInfo}
       </div>
       <div class="${badgeClass}" onclick="toggleLock(${d.id})">${lockSvg}</div>
-      <button class="delivery-delete" onclick="removeDelivery(${d.id})">&#128465;</button>
+      <button class="delivery-delete" onclick="removeDelivery(${d.id})"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
     </li>`;
   }).join('');
   initDragAndDrop();
@@ -191,12 +191,12 @@ function initDragAndDrop() {
 
     function createGhost(li, x, y) {
       ghost = document.createElement('div'); ghost.className = 'drag-ghost';
-      const num = li.querySelector('.delivery-num').textContent;
-      const addr = li.querySelector('.delivery-addr').textContent;
-      ghost.innerHTML = `<div class="delivery-num">${num}</div><span>${addr}</span>`;
+      const num = li.querySelector('.delivery-num');
+      const addr = li.querySelector('.delivery-addr');
+      ghost.innerHTML = `<div class="${num.className}">${num.textContent}</div><div class="delivery-addr">${addr.innerHTML}</div>`;
       document.body.appendChild(ghost); moveGhost(x, y);
     }
-    function moveGhost(x, y) { if (ghost) { ghost.style.left = (x + 12) + 'px'; ghost.style.top = (y - 16) + 'px'; } }
+    function moveGhost(x, y) { if (ghost) { ghost.style.left = '20px'; ghost.style.top = (y - 24) + 'px'; } }
     function removeGhost() { if (ghost) { ghost.remove(); ghost = null; } }
 
     let scrollInterval = null;
@@ -213,11 +213,18 @@ function initDragAndDrop() {
     function stopAutoScroll() { clearInterval(scrollInterval); scrollInterval = null; }
 
     function clearHighlights() { items.forEach(el => el.classList.remove('drag-neighbor-above', 'drag-neighbor-below')); }
+    let _lastHighlight = null;
     function highlightGap(y) {
       clearHighlights();
       const gap = getInsertGap(ul, y, li);
       if (gap.above) gap.above.classList.add('drag-neighbor-above');
       if (gap.below) gap.below.classList.add('drag-neighbor-below');
+      // Vibration quand on change de position
+      const key = (gap.above?.dataset.idx || '') + '-' + (gap.below?.dataset.idx || '');
+      if (key !== _lastHighlight) {
+        _lastHighlight = key;
+        if (navigator.vibrate) navigator.vibrate(15);
+      }
     }
 
     // SOURIS
