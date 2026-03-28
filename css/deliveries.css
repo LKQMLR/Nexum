@@ -7,7 +7,7 @@
 #delivery-list {
   list-style: none; display: flex; flex-direction: column; gap: 6px;
   margin-bottom: 8px; max-height: 300px; overflow-y: auto; overflow-x: clip;
-  padding: 8px 6px;
+  padding: 10px 8px;
   scrollbar-width: thin; scrollbar-color: var(--border) transparent;
 }
 
@@ -121,7 +121,7 @@
   display: flex; align-items: center; gap: 10px;
   font-size: .78rem; color: var(--text);
   opacity: .92; box-shadow: 0 8px 28px rgba(0,0,0,.55), 0 0 0 1px rgba(99,144,255,.15);
-  width: calc(100vw - 48px); max-width: 380px;
+  width: calc(100vw - 36px); max-width: 440px;
   line-height: 1.35; word-break: break-word;
 }
 .drag-ghost .delivery-num {
