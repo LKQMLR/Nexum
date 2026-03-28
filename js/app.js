@@ -269,13 +269,17 @@ function showPanelTip(el, text) {
 function hidePanelTip() {
   document.getElementById('panel-tooltip').style.display = 'none';
 }
+const _PANEL_TIPS = {
+  start: 'Entrepôt, dépôt ou domicile. CarGo calcule l\'itinéraire optimal depuis ce point.',
+  deliveries: '↕ Glisser-déposer pour réordonner · Double-tap pour changer de secteur (Premium) · <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Cadenas pour figer une position dans l\'itinéraire',
+};
 function initPanelTips() {
-  document.querySelectorAll('.help-btn[data-tip]').forEach(btn => {
-    const text = btn.dataset.tip;
-    btn.addEventListener('touchstart', () => showPanelTip(btn, text), { passive: true });
+  document.querySelectorAll('.help-btn[data-tip-key]').forEach(btn => {
+    const html = _PANEL_TIPS[btn.dataset.tipKey] || '';
+    btn.addEventListener('touchstart', () => showPanelTip(btn, html), { passive: true });
     btn.addEventListener('touchend', hidePanelTip, { passive: true });
     btn.addEventListener('touchcancel', hidePanelTip, { passive: true });
-    btn.addEventListener('mousedown', () => showPanelTip(btn, text));
+    btn.addEventListener('mousedown', () => showPanelTip(btn, html));
     btn.addEventListener('mouseup', hidePanelTip);
     btn.addEventListener('mouseleave', hidePanelTip);
   });
