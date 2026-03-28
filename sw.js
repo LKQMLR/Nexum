@@ -1,4 +1,4 @@
-const CACHE = 'cargo-v124';
+const CACHE = 'cargo-v125';
 const ASSETS = [
   './index.html', './manifest.json',
   './css/variables.css', './css/layout.css', './css/components.css',
@@ -22,12 +22,23 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // Ne pas intercepter les requêtes externes
   if (e.request.url.includes('googleapis.com') || e.request.url.includes('gstatic.com') || e.request.url.includes('googlesyndication.com') || e.request.url.includes('doubleclick.net') || e.request.url.includes('vercel.app')) return;
+
+  // Cache-first : réponse instantanée depuis le cache, mise à jour réseau en arrière-plan
   e.respondWith(
-    fetch(e.request).then(r => {
-      const clone = r.clone();
-      caches.open(CACHE).then(c => c.put(e.request, clone));
-      return r;
-    }).catch(() => caches.match(e.request))
+    caches.match(e.request).then(cached => {
+      // Mettre à jour le cache en arrière-plan (stale-while-revalidate)
+      const fetchPromise = fetch(e.request).then(r => {
+        if (r.ok) {
+          const clone = r.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return r;
+      }).catch(() => cached);
+
+      // Si en cache → réponse instantanée ; sinon → attendre le réseau
+      return cached || fetchPromise;
+    })
   );
 });
