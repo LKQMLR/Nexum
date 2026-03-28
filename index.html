@@ -35,7 +35,7 @@
 <!-- ══════════════ SIDEBAR ══════════════ -->
 <div id="sidebar">
   <div class="sidebar-header">
-    <h1><span style="color:#3b82f6">C</span><span style="color:#0d9488">a</span><span style="color:#d97706">r</span><span style="color:#db2777">G</span><span style="color:#7c3aed">o</span> <span id="premium-badge"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="#fbbf24" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> PRO</span> <span id="version-tag" style="font-size:.5rem;font-weight:400;opacity:.5;vertical-align:middle;cursor:pointer" onclick="toggleSimMode()">v151</span></h1>
+    <h1><span style="color:#3b82f6">C</span><span style="color:#0d9488">a</span><span style="color:#d97706">r</span><span style="color:#db2777">G</span><span style="color:#7c3aed">o</span> <span id="premium-badge"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="#fbbf24" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> PRO</span> <span id="version-tag" style="font-size:.5rem;font-weight:400;opacity:.5;vertical-align:middle;cursor:pointer" onclick="toggleSimMode()">v152</span></h1>
     <p>Planification intelligente de tournées</p>
   </div>
   <div class="sidebar-body">
@@ -95,9 +95,9 @@
         <div class="summary-grid" id="route-summary"></div>
         <ul id="route-steps"></ul>
         <div class="route-actions">
-          <button class="btn-route-action" onclick="triggerSave(this)">Sauvegarder</button>
+          <button class="btn-route-action btn-route-save" onclick="triggerSave(this)">Sauvegarder</button>
           <button class="btn-route-action" onclick="triggerShare(this)">Partager la tournée</button>
-          <button class="btn-route-action btn-route-export" onclick="triggerExport(this)">Exporter</button>
+          <button class="btn-route-action" onclick="triggerExport(this)">Exporter</button>
         </div>
       </div>
 
@@ -190,12 +190,15 @@
 
 <!-- ══════════════ MODALE SAUVEGARDER ══════════════ -->
 <div id="save-history-modal" class="modal-overlay" onclick="if(event.target===this)closeSaveHistoryModal()">
-  <div class="modal-box">
-    <div class="modal-title">Sauvegarder la tournée</div>
+  <div class="modal-box confirm-box">
+    <div class="modal-title" style="display:flex;align-items:center;gap:7px;justify-content:center;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg>
+      Sauvegarder la tournée
+    </div>
     <input type="text" id="save-history-name" placeholder="Nom de la tournée..." autocomplete="off" />
     <div class="modal-actions">
-      <button class="btn-primary" onclick="saveToHistory()" style="display:flex;align-items:center;justify-content:center;gap:7px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/></svg>Sauvegarder</button>
       <button class="btn-modal-cancel" onclick="closeSaveHistoryModal()">Annuler</button>
+      <button class="btn-primary" onclick="saveToHistory()">Sauvegarder</button>
     </div>
   </div>
 </div>

@@ -218,7 +218,7 @@ button:not(:disabled):hover { opacity: .85; transform: translateY(-1px); }
   transition: color .15s;
 }
 .btn-route-action:not(:disabled):hover { color: var(--text); opacity: 1; transform: none; }
-.btn-route-action:not(.btn-route-export) { color: var(--accent) !important; }
+.btn-route-save { color: var(--accent) !important; }
 .btn-route-action.blink {
   animation: route-act-blink .4s linear;
   color: var(--accent) !important;
