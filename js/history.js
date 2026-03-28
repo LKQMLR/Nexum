@@ -136,6 +136,15 @@ function deleteHistoryEntry(idx) {
   renderHistoryList();
 }
 
+// ── BLINK SUR TEXTE ACTION ──
+function blinkAction(el, fn) {
+  el.classList.remove('blink');
+  void el.offsetWidth; // reflow pour reset l'animation
+  el.classList.add('blink');
+  el.addEventListener('animationend', () => el.classList.remove('blink'), { once: true });
+  fn();
+}
+
 // ── EXPORT TEXTE / PARTAGE NATIF ──
 async function exportRoute() {
   if (!state.deliveries.length) return;
@@ -178,7 +187,7 @@ async function shareRouteUrl() {
       await navigator.share({ title: 'Ma tournée CarGo', url });
     } else {
       await navigator.clipboard.writeText(url);
-      showStatus('success', 'Lien copié — valable 24h !');
+      showStatus('success', `Lien copié — …?route=${encoded.slice(0, 8)}…`);
     }
   } catch { showStatus('error', 'Impossible de partager.'); }
 }
