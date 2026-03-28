@@ -212,16 +212,22 @@ function initDragAndDrop() {
     }
     function stopAutoScroll() { clearInterval(scrollInterval); scrollInterval = null; }
 
-    function clearHighlights() { items.forEach(el => el.classList.remove('drag-neighbor-above', 'drag-neighbor-below')); }
+    function clearHighlights() { items.forEach(el => { el.classList.remove('drag-neighbor-above', 'drag-neighbor-below'); void el.offsetWidth; }); }
     let _lastHighlight = null;
     function highlightGap(y) {
       clearHighlights();
       const gap = getInsertGap(ul, y, li);
-      if (gap.above) gap.above.classList.add('drag-neighbor-above');
-      if (gap.below) gap.below.classList.add('drag-neighbor-below');
-      // Vibration quand on change de position
       const key = (gap.above?.dataset.idx || '') + '-' + (gap.below?.dataset.idx || '');
-      if (key !== _lastHighlight) {
+      const changed = key !== _lastHighlight;
+      if (gap.above) {
+        if (changed) gap.above.style.setProperty('--pulse-dir', '-4px');
+        gap.above.classList.add('drag-neighbor-above');
+      }
+      if (gap.below) {
+        if (changed) gap.below.style.setProperty('--pulse-dir', '4px');
+        gap.below.classList.add('drag-neighbor-below');
+      }
+      if (changed) {
         _lastHighlight = key;
         if (navigator.vibrate) navigator.vibrate(15);
       }

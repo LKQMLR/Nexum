@@ -22,16 +22,23 @@
   position: relative; overflow: visible;
 }
 
-/* ── DRAG & DROP — voisins lumineux ── */
+/* ── DRAG & DROP — voisins lumineux + pulse ── */
 #delivery-list li.drag-neighbor-above {
   border-color: rgba(100,180,255,.7);
   box-shadow: 0 0 10px rgba(80,160,255,.4), inset 0 0 6px rgba(80,160,255,.1);
-  transform: translateY(-3px);
+  transform: translateY(-4px) scale(1.02);
+  animation: drag-pulse .35s ease-out;
 }
 #delivery-list li.drag-neighbor-below {
   border-color: rgba(100,180,255,.7);
   box-shadow: 0 0 10px rgba(80,160,255,.4), inset 0 0 6px rgba(80,160,255,.1);
-  transform: translateY(3px);
+  transform: translateY(4px) scale(1.02);
+  animation: drag-pulse .35s ease-out;
+}
+@keyframes drag-pulse {
+  0%   { transform: translateY(0) scale(1); }
+  40%  { transform: translateY(var(--pulse-dir, -4px)) scale(1.04); }
+  100% { transform: translateY(var(--pulse-dir, -4px)) scale(1.02); }
 }
 #delivery-list li.dragging { opacity: .15; }
 
