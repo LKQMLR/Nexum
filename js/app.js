@@ -114,7 +114,6 @@ function initApp() {
 
   restoreSession();
   if (typeof checkSharedRoute === 'function') checkSharedRoute();
-  initPanelTips();
 
   // Initialiser le système premium
   if (typeof initPremium === 'function') initPremium();
@@ -273,17 +272,18 @@ const _PANEL_TIPS = {
   start: 'Entrepôt, dépôt ou domicile. CarGo calcule l\'itinéraire optimal depuis ce point.',
   deliveries: '↕ Glisser-déposer pour réordonner · Double-tap pour changer de secteur (Premium) · <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Cadenas pour figer une position dans l\'itinéraire',
 };
-function initPanelTips() {
-  document.querySelectorAll('.help-btn[data-tip-key]').forEach(btn => {
-    const html = _PANEL_TIPS[btn.dataset.tipKey] || '';
-    btn.addEventListener('touchstart', () => showPanelTip(btn, html), { passive: true });
-    btn.addEventListener('touchend', hidePanelTip, { passive: true });
-    btn.addEventListener('touchcancel', hidePanelTip, { passive: true });
-    btn.addEventListener('mousedown', () => showPanelTip(btn, html));
-    btn.addEventListener('mouseup', hidePanelTip);
-    btn.addEventListener('mouseleave', hidePanelTip);
-  });
-}
+// Délégation : aucune init requise, fonctionne dès le chargement du DOM
+document.addEventListener('mousedown', e => {
+  const btn = e.target.closest('.help-btn[data-tip-key]');
+  if (btn) showPanelTip(btn, _PANEL_TIPS[btn.dataset.tipKey] || '');
+});
+document.addEventListener('mouseup', hidePanelTip);
+document.addEventListener('touchstart', e => {
+  const btn = e.target.closest('.help-btn[data-tip-key]');
+  if (btn) showPanelTip(btn, _PANEL_TIPS[btn.dataset.tipKey] || '');
+}, { passive: true });
+document.addEventListener('touchend', hidePanelTip, { passive: true });
+document.addEventListener('touchcancel', hidePanelTip, { passive: true });
 
 // ── CONFIRM CUSTOM (remplace window.confirm) ──
 function showConfirm(msg) {
