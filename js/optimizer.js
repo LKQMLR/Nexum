@@ -107,9 +107,12 @@ async function optimizeSegment(origin, deliveries) {
 }
 
 // ── OPTIMISATION PRINCIPALE ──
+let _optimizeLocked = false;
 async function optimizeRoute() {
-  if (!state.startPoint) return showStatus('error', 'Définissez un point de départ.');
-  if (!state.deliveries.length) return showStatus('error', 'Ajoutez au moins une adresse.');
+  if (_optimizeLocked) return;
+  _optimizeLocked = true;
+  if (!state.startPoint) { _optimizeLocked = false; return showStatus('error', 'Définissez un point de départ.'); }
+  if (!state.deliveries.length) { _optimizeLocked = false; return showStatus('error', 'Ajoutez au moins une adresse.'); }
 
   // Sauvegarder la session AVANT l'optimisation (protection contre perte)
   saveSession();
@@ -191,6 +194,7 @@ async function optimizeRoute() {
   renderDeliveryList();
   displayRoute([state.startPoint, ...state.deliveries]);
   saveSession();
+  _optimizeLocked = false;
 
   } catch (err) {
     // Restaurer les adresses en cas d'erreur
@@ -199,5 +203,6 @@ async function optimizeRoute() {
     saveSession();
     showStatus('error', 'Erreur d\'optimisation. Vos adresses ont été conservées.');
     setUIBusy(false);
+    _optimizeLocked = false;
   }
 }

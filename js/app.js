@@ -191,7 +191,21 @@ function restoreSession() {
         }, 1000);
       }
     }
-  } catch {}
+  } catch (e) {
+    console.error('[CarGo] ERREUR restauration session:', e);
+    // Tenter de restaurer au moins le point de départ
+    try {
+      const sp = localStorage.getItem('cargo_startPoint');
+      if (sp) {
+        const s = JSON.parse(sp);
+        const marker = createClassicMarker({ lat: s.lat, lng: s.lng }, 'D', '#22c55e', 'Départ');
+        state.startPoint = { ...s, marker };
+        document.getElementById('start-display').textContent = s.formatted;
+        document.getElementById('start-display').classList.add('visible');
+        document.getElementById('start-input').value = s.address;
+      }
+    } catch {}
+  }
 }
 
 // ── MAP PREFERENCES ──
@@ -270,6 +284,21 @@ function resetAll() {
   document.getElementById('btn-nav-start').classList.remove('visible');
   document.getElementById('status-bar').className = '';
   localStorage.removeItem('cargo_session');
+}
+
+// ── VIDER LE CACHE (sans race condition) ──
+async function clearCacheAndData() {
+  if (!confirm('Effacer toutes les données (cache, session, préférences) et recharger ?')) return;
+  const sp = localStorage.getItem('cargo_startPoint');
+  try {
+    const keys = await caches.keys();
+    await Promise.all(keys.map(k => caches.delete(k)));
+    localStorage.clear();
+    if (sp) localStorage.setItem('cargo_startPoint', sp);
+    const regs = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(regs.map(r => r.unregister()));
+  } catch (e) { console.error('Erreur nettoyage:', e); }
+  location.reload(true);
 }
 
 // Service Worker

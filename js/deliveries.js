@@ -15,7 +15,12 @@ function esc(s) {
 let activeSector = 0;
 const SECTOR_LABELS = ['Aucun secteur', 'Secteur 1', 'Secteur 2', 'Secteur 3', 'Secteur 4', 'Secteur 5'];
 
+let _sectorLocked = false;
 function cycleSector() {
+  if (_sectorLocked) return;
+  _sectorLocked = true;
+  setTimeout(() => { _sectorLocked = false; }, 300);
+
   let next = (activeSector + 1) % 6;
   // En gratuit : secteurs 0, 1, 2 uniquement
   if (next > 0 && !checkSectorLimit(next)) {
