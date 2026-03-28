@@ -161,14 +161,15 @@ function applyPremium(active) {
   const proxCheck = document.getElementById('prox-check');
   const proxToggle = document.getElementById('prox-toggle');
   if (proxCheck && proxToggle) {
+    const proxLabel = proxToggle.querySelector('label');
     if (!active) {
       proxCheck.checked = false;
       proxCheck.disabled = true;
-      proxToggle.style.opacity = '.5';
+      if (proxLabel) proxLabel.style.opacity = '.5';
       proxToggle.title = 'Fonctionnalit\u00e9 Premium';
     } else {
       proxCheck.disabled = false;
-      proxToggle.style.opacity = '';
+      if (proxLabel) proxLabel.style.opacity = '';
       proxToggle.title = '';
     }
   }
