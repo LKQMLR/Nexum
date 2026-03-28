@@ -96,6 +96,7 @@ function initApp() {
   // Raccourcis clavier
   document.getElementById('start-input').addEventListener('keydown', e => { if (e.key === 'Enter') handleSetStart(); });
   document.getElementById('delivery-input').addEventListener('keydown', e => { if (e.key === 'Enter') handleAddDelivery(); });
+  document.getElementById('save-history-name').addEventListener('keydown', e => { if (e.key === 'Enter') saveToHistory(); if (e.key === 'Escape') closeSaveHistoryModal(); });
 
   // Préférences carte
   restoreMapPrefs();
@@ -112,6 +113,7 @@ function initApp() {
   state.map.addListener('heading_changed', saveMapPrefs);
 
   restoreSession();
+  if (typeof checkSharedRoute === 'function') checkSharedRoute();
 
   // Initialiser le système premium
   if (typeof initPremium === 'function') initPremium();
