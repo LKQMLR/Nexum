@@ -6,8 +6,8 @@
 /* ── LISTE ── */
 #delivery-list {
   list-style: none; display: flex; flex-direction: column; gap: 6px;
-  margin-bottom: 8px; max-height: 300px; overflow-y: auto; overflow-x: clip;
-  padding: 10px 8px;
+  margin-bottom: 8px; max-height: 300px; overflow-y: auto; overflow-x: hidden;
+  padding: 4px 2px;
   scrollbar-width: thin; scrollbar-color: var(--border) transparent;
 }
 
@@ -46,10 +46,10 @@
 #delivery-list li.swiping { transition: transform .2s ease-out, opacity .2s; }
 #delivery-list li.swipe-out { transform: translateX(-100%); opacity: 0; }
 
-/* ── BLUR SUR CONTENU (activé au swipe) ── */
+/* ── CONTENU WRAPPÉ (pour le blur au swipe) ── */
 #delivery-list li .delivery-content {
   display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;
-  padding: 12px 28px 12px 10px;
+  padding: 12px 28px 12px 10px; overflow: hidden;
   transition: filter .25s ease, opacity .25s ease;
 }
 #delivery-list li.swipe-reveal .delivery-content {
