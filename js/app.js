@@ -258,7 +258,7 @@ function setUIBusy(b) {
 // ── TOOLTIP PANEL (position:fixed, hors contexte de clipping) ──
 function showPanelTip(el, text) {
   const tip = document.getElementById('panel-tooltip');
-  tip.textContent = text;
+  tip.innerHTML = text;
   tip.style.display = 'block';
   const r = el.getBoundingClientRect();
   let left = r.right - 220;
