@@ -148,8 +148,9 @@ function showFreqDropdown(inputId, dropdownId) {
 
   const filterFn = a => q.length === 0 || a.formatted.toLowerCase().includes(q) || a.address.toLowerCase().includes(q) || (a.placeName && a.placeName.toLowerCase().includes(q));
 
-  const favMatches = favs.filter(filterFn).slice(0, 5);
-  const recentMatches = all.filter(a => !favFormatted.has(a.formatted) && filterFn(a)).slice(0, 5);
+  const isStartInput = inputId === 'start-input';
+  const favMatches = isStartInput ? favs.filter(filterFn).slice(0, 5) : [];
+  const recentMatches = all.filter(a => (!isStartInput || !favFormatted.has(a.formatted)) && filterFn(a)).slice(0, 5);
 
   if (!favMatches.length && !recentMatches.length) { dd.classList.remove('visible'); return; }
 

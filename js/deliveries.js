@@ -363,18 +363,23 @@ function initDoubleTapSector() {
   const items = document.querySelectorAll('#delivery-list li');
   items.forEach(li => {
     let lastTap = 0;
+    let usedTouch = false;
     li.addEventListener('touchend', e => {
       if (e.target.closest('.drag-handle') || e.target.closest('.lock-badge') || e.target.closest('.delivery-delete') || e.target.closest('.delivery-note-input') || e.target.closest('.delivery-note')) return;
+      usedTouch = true;
       const now = Date.now();
       if (now - lastTap < 350) {
         e.preventDefault();
         const id = parseInt(li.dataset.id);
         cycleSectorForDelivery(id, li);
+        lastTap = 0;
+      } else {
+        lastTap = now;
       }
-      lastTap = now;
     });
-    // Desktop : double-click
+    // Desktop uniquement (pas si touch déjà utilisé)
     li.addEventListener('dblclick', e => {
+      if (usedTouch) return;
       if (e.target.closest('.drag-handle') || e.target.closest('.lock-badge') || e.target.closest('.delivery-delete') || e.target.closest('.delivery-note-input') || e.target.closest('.delivery-note')) return;
       const id = parseInt(li.dataset.id);
       cycleSectorForDelivery(id, li);
