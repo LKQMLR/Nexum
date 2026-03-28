@@ -9,6 +9,7 @@
 .results-title {
   font-size: .68rem; font-weight: 700; text-transform: uppercase;
   letter-spacing: .8px; color: var(--text2); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
 }
 
 /* ── GRILLE RÉSUMÉ (distance, durée, arrêts) ── */

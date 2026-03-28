@@ -35,7 +35,7 @@
 <!-- ══════════════ SIDEBAR ══════════════ -->
 <div id="sidebar">
   <div class="sidebar-header">
-    <h1>CarGo <span id="premium-badge"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="#fbbf24" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> PRO</span> <span id="version-tag" style="font-size:.5rem;font-weight:400;opacity:.5;vertical-align:middle;cursor:pointer" onclick="toggleSimMode()">v138</span></h1>
+    <h1>CarGo <span id="premium-badge"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="#fbbf24" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> PRO</span> <span id="version-tag" style="font-size:.5rem;font-weight:400;opacity:.5;vertical-align:middle;cursor:pointer" onclick="toggleSimMode()">v139</span></h1>
     <p>Planification intelligente de tournées</p>
   </div>
   <div class="sidebar-body">
@@ -50,8 +50,9 @@
       <!-- ── Point de départ ── -->
       <div class="section section-start">
         <div class="section-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12h4"/><path d="M10 8h4"/><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg>
           Votre base
-          <span class="help-btn" ontouchstart="showPanelTip(this,'Entrepôt, dépôt ou domicile. CarGo calcule l\'itinéraire optimal depuis ce point.')" ontouchend="hidePanelTip()" ontouchcancel="hidePanelTip()" onmousedown="showPanelTip(this,'Entrepôt, dépôt ou domicile. CarGo calcule l\'itinéraire optimal depuis ce point.')" onmouseup="hidePanelTip()" onmouseleave="hidePanelTip()">?</span>
+          <span class="help-btn" data-tip="Entrepôt, dépôt ou domicile. CarGo calcule l'itinéraire optimal depuis ce point.">?</span>
         </div>
         <div class="input-wrapper">
           <input type="text" id="start-input" placeholder="Adresse de départ..." autocomplete="off" />
@@ -67,8 +68,9 @@
       <!-- ── Adresses de livraison ── -->
       <div class="section section-deliveries">
         <div class="section-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9.5C2 7 4 5 6.5 5H18c2.2 0 4 1.8 4 4v8Z"/><polyline points="15,9 18,9 18,11"/><path d="M6.5 5C9 5 11 7 11 9.5V17a2 2 0 0 1-2 2"/><line x1="6" x2="7" y1="10" y2="10"/></svg>
           Adresses de livraison <span id="delivery-count"></span>
-          <span class="help-btn" ontouchstart="showPanelTip(this,'↕ Glisser-déposer pour réordonner · Double-tap pour changer de secteur (Premium) · 🔒 Cadenas pour figer une position dans l\'itinéraire')" ontouchend="hidePanelTip()" ontouchcancel="hidePanelTip()" onmousedown="showPanelTip(this,'↕ Glisser-déposer pour réordonner · Double-tap pour changer de secteur (Premium) · 🔒 Cadenas pour figer une position dans l\'itinéraire')" onmouseup="hidePanelTip()" onmouseleave="hidePanelTip()">?</span>
+          <span class="help-btn" data-tip="↕ Glisser-déposer pour réordonner · Double-tap pour changer de secteur (Premium) · 🔒 Cadenas pour figer une position dans l'itinéraire">?</span>
         </div>
         <ul id="delivery-list"></ul>
         <div class="input-row">
@@ -89,7 +91,7 @@
 
       <!-- ── Itinéraire optimisé ── -->
       <div id="results-panel" class="section section-route">
-        <div class="results-title">Itinéraire optimisé</div>
+        <div class="results-title"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dde010" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>Itinéraire optimisé</div>
         <div class="summary-grid" id="route-summary"></div>
         <ul id="route-steps"></ul>
         <div class="route-actions">

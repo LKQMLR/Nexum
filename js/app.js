@@ -114,6 +114,7 @@ function initApp() {
 
   restoreSession();
   if (typeof checkSharedRoute === 'function') checkSharedRoute();
+  initPanelTips();
 
   // Initialiser le système premium
   if (typeof initPremium === 'function') initPremium();
@@ -260,15 +261,24 @@ function showPanelTip(el, text) {
   tip.textContent = text;
   tip.style.display = 'block';
   const r = el.getBoundingClientRect();
-  const tipW = 220;
-  let left = r.right - tipW;
+  let left = r.right - 220;
   if (left < 8) left = 8;
-  const top = r.bottom + 8;
   tip.style.left = left + 'px';
-  tip.style.top = top + 'px';
+  tip.style.top = (r.bottom + 8) + 'px';
 }
 function hidePanelTip() {
   document.getElementById('panel-tooltip').style.display = 'none';
+}
+function initPanelTips() {
+  document.querySelectorAll('.help-btn[data-tip]').forEach(btn => {
+    const text = btn.dataset.tip;
+    btn.addEventListener('touchstart', () => showPanelTip(btn, text), { passive: true });
+    btn.addEventListener('touchend', hidePanelTip, { passive: true });
+    btn.addEventListener('touchcancel', hidePanelTip, { passive: true });
+    btn.addEventListener('mousedown', () => showPanelTip(btn, text));
+    btn.addEventListener('mouseup', hidePanelTip);
+    btn.addEventListener('mouseleave', hidePanelTip);
+  });
 }
 
 // ── CONFIRM CUSTOM (remplace window.confirm) ──
