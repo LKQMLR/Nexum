@@ -232,6 +232,7 @@ button:not(:disabled):hover { opacity: .85; transform: translateY(-1px); }
 #btn-history {
   background: transparent; color: var(--text2); border: 1px solid var(--border);
   width: 100%; padding: 8px; font-size: .78rem; border-radius: 8px; margin-top: 4px;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
 }
 #btn-history:not(:disabled):hover { background: var(--surface2); color: var(--text); }
 

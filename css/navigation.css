@@ -11,7 +11,7 @@
   text-transform: uppercase;
   border: 1px solid rgba(34,197,94,.5);
 }
-#btn-nav-start.visible { display: block; }
+#btn-nav-start.visible { display: flex; align-items: center; justify-content: center; gap: 8px; }
 
 /* ── PANNEAU NAVIGATION ── */
 #nav-panel { display: none; }
