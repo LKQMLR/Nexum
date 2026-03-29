@@ -113,8 +113,8 @@ function openAccountMenu() {
     endLine = `<div class="account-menu-end">${sub.cancelAtPeriodEnd ? 'Expire le' : 'Renouvellement le'} ${fmt}</div>`;
   }
 
-  // Bouton désabonnement (masqué pour les owners — pas d'abonnement Stripe)
-  const cancelBtn = (sub.active && !sub.cancelAtPeriodEnd && !sub.isOwner)
+  // Bouton désabonnement (visible si premium actif et pas encore en annulation)
+  const cancelBtn = (sub.active && !sub.cancelAtPeriodEnd)
     ? `<button class="account-menu-btn account-menu-cancel" onclick="openCancelModal()">Se désabonner</button>`
     : '';
 
@@ -205,14 +205,18 @@ async function confirmCancelSubscription() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),
     });
-    if (!res.ok) throw new Error();
+    if (res.status === 404) throw new Error('no_sub');
+    if (!res.ok) throw new Error('server');
     document.getElementById('cancel-sub-modal')?.remove();
     window._subscriptionData.cancelAtPeriodEnd = true;
     updateAuthUI();
     if (typeof showStatus === 'function') showStatus('success', 'Désabonnement confirmé. Premium actif jusqu\'à la fin de la période.');
-  } catch {
+  } catch (err) {
     if (btn) { btn.disabled = false; btn.textContent = 'Se désabonner'; }
-    if (typeof showStatus === 'function') showStatus('error', 'Erreur — réessaie ou contacte le support.');
+    const msg = err.message === 'no_sub'
+      ? 'Aucun abonnement Stripe trouvé pour ce compte.'
+      : 'Erreur — réessaie ou contacte le support.';
+    if (typeof showStatus === 'function') showStatus('error', msg);
   }
 }
 
