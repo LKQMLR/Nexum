@@ -100,7 +100,7 @@ async function checkPremiumStatus(email) {
   // Ne pas vérifier côté serveur si c'est un email propriétaire
   if (await isOwnerEmail(email)) {
     _premiumVerified = true;
-    window._subscriptionData = { active: true, currentPeriodEnd: null, cancelAtPeriodEnd: false };
+    window._subscriptionData = { active: true, currentPeriodEnd: null, cancelAtPeriodEnd: false, isOwner: true };
     applyPremium(true);
     if (typeof updateAuthUI === 'function') updateAuthUI();
     return;

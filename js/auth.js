@@ -113,8 +113,8 @@ function openAccountMenu() {
     endLine = `<div class="account-menu-end">${sub.cancelAtPeriodEnd ? 'Expire le' : 'Renouvellement le'} ${fmt}</div>`;
   }
 
-  // Bouton désabonnement (visible si premium actif et pas encore en annulation)
-  const cancelBtn = (sub.active && !sub.cancelAtPeriodEnd)
+  // Bouton désabonnement (masqué pour les owners — pas d'abonnement Stripe)
+  const cancelBtn = (sub.active && !sub.cancelAtPeriodEnd && !sub.isOwner)
     ? `<button class="account-menu-btn account-menu-cancel" onclick="openCancelModal()">Se désabonner</button>`
     : '';
 
