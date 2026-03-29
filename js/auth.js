@@ -112,7 +112,7 @@ function openAccountMenu() {
   }
 
   // Bouton désabonnement (visible si premium actif et pas encore en annulation)
-  const cancelBtn = (sub.active && !sub.cancelAtPeriodEnd)
+  const cancelBtn = (sub.active && !sub.cancelAtPeriodEnd && !sub.isOwner)
     ? `<button class="account-menu-btn account-menu-cancel" onclick="openCancelModal()">Se désabonner</button>`
     : '';
 
