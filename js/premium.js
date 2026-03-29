@@ -287,7 +287,11 @@ async function subscribePremium() {
   btn.disabled = true;
 
   try {
-    const res = await fetch(`${CARGO_API}/api/create-checkout?email=${encodeURIComponent(email)}`);
+    const res = await fetch(`${CARGO_API}/api/create-checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
 
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Erreur serveur');
@@ -316,7 +320,11 @@ async function managePremium() {
     return;
   }
   try {
-    const res = await fetch(`${CARGO_API}/api/customer-portal?email=${encodeURIComponent(email)}`);
+    const res = await fetch(`${CARGO_API}/api/customer-portal`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
     if (!res.ok) throw new Error();
     const data = await res.json();
     window.location.href = data.url;
