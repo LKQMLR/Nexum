@@ -341,22 +341,37 @@ button:not(:disabled):hover { opacity: .85; transform: translateY(-1px); }
 .account-menu-logout:hover { background: var(--red-bg); }
 
 /* ── MODALE AUTH ── */
-.auth-box { gap: 8px; }
-.auth-tabs { display: flex; gap: 4px; margin-bottom: 4px; }
-.auth-tab {
-  flex: 1; padding: 7px; background: var(--bg); border: 1px solid var(--border);
-  border-radius: 8px; color: var(--text2); font-size: .75rem; cursor: pointer;
-  transition: background .2s, color .2s;
+.auth-box { gap: 10px; }
+.auth-title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: .92rem; font-weight: 700; color: var(--text);
+  margin-bottom: 2px;
 }
-.auth-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 .auth-error {
   font-size: .72rem; padding: 6px 10px; background: var(--red-bg);
   border-radius: 8px; color: var(--red); line-height: 1.4;
 }
 #auth-email, #auth-password {
-  width: 100%; padding: 9px 12px; background: var(--bg); border: 1.5px solid var(--border);
+  width: 100%; padding: 10px 12px; background: var(--bg); border: 1.5px solid var(--border);
   border-radius: 8px; color: var(--text); font-size: .82rem; box-sizing: border-box;
   outline: none; transition: border-color .2s;
 }
-#auth-email:focus, #auth-password:focus { border-color: var(--accent); }
+#auth-email:focus, #auth-password:focus { border-color: #facc15; }
+.btn-auth-submit {
+  width: 100%; padding: 12px; font-size: .85rem; font-weight: 700;
+  background: linear-gradient(135deg, #fef3c7, #facc15, #eab308);
+  color: #1a1a2e; border: 1px solid rgba(250,204,21,.6);
+  border-radius: var(--radius); letter-spacing: .3px; text-transform: uppercase;
+  cursor: pointer; transition: opacity .2s, transform .15s;
+}
+.btn-auth-submit:hover { opacity: .9; transform: translateY(-1px); }
+.btn-auth-submit:disabled { opacity: .5; transform: none; cursor: not-allowed; }
+.auth-switch {
+  text-align: center; font-size: .72rem; color: var(--text2); margin: 0;
+}
+.auth-switch span {
+  color: #facc15; cursor: pointer; text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.auth-switch span:hover { opacity: .8; }
 .prox-tooltip.show { display: block !important; }

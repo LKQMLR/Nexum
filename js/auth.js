@@ -135,23 +135,29 @@ function openAuthModal(tab) {
   modal.id = 'auth-modal';
   modal.className = 'modal-overlay';
   modal.innerHTML = `
-    <div class="modal-box confirm-box auth-box">
-      <div class="auth-tabs">
-        <button class="auth-tab${isSignin ? ' active' : ''}" onclick="openAuthModal('signin')">Se connecter</button>
-        <button class="auth-tab${!isSignin ? ' active' : ''}" onclick="openAuthModal('signup')">Créer un compte</button>
+    <div class="modal-box auth-box">
+      <div class="auth-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/>
+        </svg>
+        ${isSignin ? 'Connexion' : 'Créer un compte'}
       </div>
       <div id="auth-error" class="auth-error" style="display:none;"></div>
       <input type="email"    id="auth-email"    placeholder="Adresse email"  autocomplete="email" />
-      <input type="password" id="auth-password" placeholder="Mot de passe (6 car. min.)"
+      <input type="password" id="auth-password" placeholder="Mot de passe"
         autocomplete="${isSignin ? 'current-password' : 'new-password'}" />
-      <button class="btn-primary" id="auth-submit" onclick="submitAuth('${tab}')">
+      <button class="btn-auth-submit" id="auth-submit" onclick="submitAuth('${tab}')">
         ${isSignin ? 'Se connecter' : 'Créer mon compte'}
       </button>
-      <button class="btn-modal-cancel" onclick="closeAuthModal()">Annuler</button>
+      <p class="auth-switch">
+        ${isSignin
+          ? 'Pas de compte ? <span onclick="openAuthModal(\'signup\')">Créer un compte</span>'
+          : 'Déjà un compte ? <span onclick="openAuthModal(\'signin\')">Se connecter</span>'}
+      </p>
     </div>
   `;
   modal.addEventListener('click', e => { if (e.target === modal) closeAuthModal(); });
-  // Soumettre avec Entrée
   modal.addEventListener('keydown', e => { if (e.key === 'Enter') submitAuth(tab); });
   document.body.appendChild(modal);
   requestAnimationFrame(() => modal.classList.add('visible'));
