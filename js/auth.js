@@ -158,30 +158,31 @@ function openAccountMenu() {
 function openCancelModal() {
   document.getElementById('account-menu')?.remove();
   const sub = window._subscriptionData || {};
-  let endStr = '30 jours';
-  if (sub.currentPeriodEnd) {
-    const d = new Date(sub.currentPeriodEnd * 1000);
-    endStr = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-  }
+  const endLine = sub.currentPeriodEnd
+    ? `<p class="cancel-end-date">Votre abonnement prendra fin le&nbsp;:<br><strong>${new Date(sub.currentPeriodEnd * 1000).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</strong></p>`
+    : '';
 
   const modal = document.createElement('div');
   modal.id = 'cancel-sub-modal';
   modal.className = 'modal-overlay';
   modal.innerHTML = `
-    <div class="modal-box confirm-box">
-      <div class="confirm-icon">⚠️</div>
-      <div class="confirm-msg">
-        Votre accès Premium restera actif jusqu'au <strong>${endStr}</strong>.<br><br>
-        Aucun remboursement ne sera effectué pour la période en cours.
+    <div class="modal-box cancel-box">
+      <div class="cancel-header">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M16 16s-1.5-2-4-2-4 2-4 2"/>
+          <line x1="9" x2="9.01" y1="9" y2="9"/>
+          <line x1="15" x2="15.01" y1="9" y2="9"/>
+        </svg>
+        <span>Vous nous quittez&nbsp;?</span>
       </div>
+      ${endLine}
       <div class="modal-actions">
-        <button class="btn-modal-cancel" onclick="document.getElementById('cancel-sub-modal')?.remove()">
-          Garder Premium
-        </button>
-        <button class="btn-warning" id="btn-confirm-cancel" onclick="confirmCancelSubscription()">
-          Se désabonner
-        </button>
+        <button class="btn-modal-cancel" id="btn-confirm-cancel" onclick="confirmCancelSubscription()">Se désabonner</button>
+        <button class="btn-auth-submit" onclick="document.getElementById('cancel-sub-modal')?.remove()">Garder Premium</button>
       </div>
+      <p class="cancel-legal">*aucun remboursement ne peut être fait pour la période en cours</p>
     </div>
   `;
   modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });

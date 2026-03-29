@@ -403,4 +403,20 @@ button:not(:disabled):hover { opacity: .85; transform: translateY(-1px); }
   text-underline-offset: 2px;
 }
 .auth-switch span:hover { opacity: .8; }
+
+/* ── MODALE DÉSABONNEMENT ── */
+.cancel-box { gap: 12px; text-align: center; }
+.cancel-header {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  font-size: .92rem; font-weight: 700; color: var(--text);
+}
+.cancel-header svg { color: var(--text2); flex-shrink: 0; }
+.cancel-end-date {
+  font-size: .78rem; color: var(--text2); margin: 0; line-height: 1.6;
+}
+.cancel-end-date strong { color: var(--text); font-size: .85rem; }
+.cancel-legal {
+  font-size: .62rem; color: var(--text2); opacity: .6; margin: 0;
+  font-style: italic;
+}
 .prox-tooltip.show { display: block !important; }
