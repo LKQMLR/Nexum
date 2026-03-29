@@ -233,8 +233,8 @@ function openAccountMenu() {
   const menu = document.createElement('div');
   menu.id = 'account-menu';
   menu.className = 'account-menu';
-  menu.style.top  = (rect.bottom + 6) + 'px';
-  menu.style.left = rect.left + 'px';
+  menu.style.top   = (rect.bottom + 6) + 'px';
+  menu.style.right = (window.innerWidth - rect.right) + 'px';
   menu.innerHTML = `
     <div class="account-menu-username">${_userProfile?.username || _authUser.email}</div>
     <div class="account-menu-sub">

@@ -332,7 +332,8 @@ button:not(:disabled):hover { opacity: .85; transform: translateY(-1px); }
 /* ── MENU COMPTE ── */
 .account-menu {
   position: fixed; background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 6px; padding: 6px; z-index: 10020; min-width: 210px;
+  border-radius: 6px; padding: 6px; z-index: 10020;
+  width: 220px; max-width: calc(100vw - 16px);
   box-shadow: 0 4px 20px rgba(0,0,0,.5);
 }
 .account-menu-username {
