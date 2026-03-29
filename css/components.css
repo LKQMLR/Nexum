@@ -385,11 +385,11 @@ button:not(:disabled):hover { opacity: .85; transform: translateY(-1px); }
   border-radius: 8px; color: var(--text); font-size: .82rem; box-sizing: border-box;
   outline: none; transition: border-color .2s;
 }
-#auth-email:focus, #auth-password:focus, #auth-password2:focus { border-color: #ED8294; }
+#auth-email:focus, #auth-password:focus, #auth-password2:focus { border-color: #f97316; }
 .btn-auth-submit {
   width: 100%; padding: 12px; font-size: .85rem; font-weight: 700;
-  background: linear-gradient(135deg, #E02947, #ED8294);
-  color: #fff; border: none;
+  background: linear-gradient(135deg, #f97316, #fbbf24);
+  color: #1a1a2e; border: none;
   border-radius: var(--radius); letter-spacing: .3px; text-transform: uppercase;
   cursor: pointer; transition: opacity .2s, transform .15s;
 }
@@ -399,7 +399,7 @@ button:not(:disabled):hover { opacity: .85; transform: translateY(-1px); }
   text-align: center; font-size: .72rem; color: var(--text2); margin: 0;
 }
 .auth-switch span {
-  color: #ED8294; cursor: pointer; text-decoration: underline;
+  color: #fbbf24; cursor: pointer; text-decoration: underline;
   text-underline-offset: 2px;
 }
 .auth-switch span:hover { opacity: .8; }
