@@ -17,6 +17,14 @@ function saveToHistory() {
     || `Tournée du ${new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}`;
   if (!state.deliveries.length) return;
   const history = getHistory();
+
+  const todayStr = new Date().toDateString();
+  const alreadySaved = history.some(e => new Date(e.date).toDateString() === todayStr);
+  if (alreadySaved) {
+    closeSaveHistoryModal();
+    showStatus('error', 'Une tournée a déjà été sauvegardée aujourd\'hui.');
+    return;
+  }
   const entry = {
     id: Date.now(),
     name,
