@@ -59,6 +59,12 @@ async function fetchProfile(userId) {
     .eq('id', userId)
     .maybeSingle();
   _userProfile = data || null;
+
+  // Fallback : username dans les métadonnées (créé par le trigger, pas encore lisible)
+  if (!_userProfile && _authUser?.user_metadata?.username) {
+    _userProfile = { username: _authUser.user_metadata.username };
+  }
+
   updateAuthUI();
   if (!_userProfile) promptSetUsername();
 }
@@ -127,7 +133,7 @@ async function saveUsername() {
   }
 
   const { error } = await _supabase
-    .from('profiles').insert({ id: _authUser.id, username });
+    .from('profiles').upsert({ id: _authUser.id, username }, { onConflict: 'id' });
   if (error) {
     btn.disabled = false;
     btn.textContent = 'Confirmer';
