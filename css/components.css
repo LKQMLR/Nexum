@@ -351,16 +351,16 @@ button:not(:disabled):hover { opacity: .85; transform: translateY(-1px); }
   font-size: .72rem; padding: 6px 10px; background: var(--red-bg);
   border-radius: 8px; color: var(--red); line-height: 1.4;
 }
-#auth-email, #auth-password {
+#auth-email, #auth-password, #auth-password2 {
   width: 100%; padding: 10px 12px; background: var(--bg); border: 1.5px solid var(--border);
   border-radius: 8px; color: var(--text); font-size: .82rem; box-sizing: border-box;
   outline: none; transition: border-color .2s;
 }
-#auth-email:focus, #auth-password:focus { border-color: #facc15; }
+#auth-email:focus, #auth-password:focus, #auth-password2:focus { border-color: #ED8294; }
 .btn-auth-submit {
   width: 100%; padding: 12px; font-size: .85rem; font-weight: 700;
-  background: linear-gradient(135deg, #fef3c7, #facc15, #eab308);
-  color: #1a1a2e; border: 1px solid rgba(250,204,21,.6);
+  background: linear-gradient(135deg, #E02947, #ED8294);
+  color: #fff; border: none;
   border-radius: var(--radius); letter-spacing: .3px; text-transform: uppercase;
   cursor: pointer; transition: opacity .2s, transform .15s;
 }
@@ -370,7 +370,7 @@ button:not(:disabled):hover { opacity: .85; transform: translateY(-1px); }
   text-align: center; font-size: .72rem; color: var(--text2); margin: 0;
 }
 .auth-switch span {
-  color: #facc15; cursor: pointer; text-decoration: underline;
+  color: #ED8294; cursor: pointer; text-decoration: underline;
   text-underline-offset: 2px;
 }
 .auth-switch span:hover { opacity: .8; }

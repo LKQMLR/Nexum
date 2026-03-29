@@ -147,6 +147,7 @@ function openAuthModal(tab) {
       <input type="email"    id="auth-email"    placeholder="Adresse email"  autocomplete="email" />
       <input type="password" id="auth-password" placeholder="Mot de passe"
         autocomplete="${isSignin ? 'current-password' : 'new-password'}" />
+      ${!isSignin ? `<input type="password" id="auth-password2" placeholder="Confirmer le mot de passe" autocomplete="new-password" />` : ''}
       <button class="btn-auth-submit" id="auth-submit" onclick="submitAuth('${tab}')">
         ${isSignin ? 'Se connecter' : 'Créer mon compte'}
       </button>
@@ -178,8 +179,15 @@ async function submitAuth(tab) {
   const email    = emailEl?.value.trim()  || '';
   const password = passwordEl?.value      || '';
 
+  const password2El = document.getElementById('auth-password2');
+  const password2   = password2El?.value || '';
+
   if (!email || !password) {
     _showAuthError(errEl, 'Remplis tous les champs.');
+    return;
+  }
+  if (tab === 'signup' && password !== password2) {
+    _showAuthError(errEl, 'Les mots de passe ne correspondent pas.');
     return;
   }
 
