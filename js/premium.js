@@ -220,6 +220,14 @@ function showPremiumModal() {
           </ul>
         </div>
       </div>
+      <div class="premium-daypass">
+        <div class="premium-daypass-info">
+          <span class="premium-daypass-name">Passe journ\u00e9e</span>
+          <span class="premium-daypass-desc">Profitez de tout en illimit\u00e9 pendant 24h</span>
+        </div>
+        <span class="premium-daypass-price">1,99\u20ac</span>
+        <span class="premium-daypass-soon">Bient\u00f4t</span>
+      </div>
       <input type="email" id="premium-email" placeholder="Votre adresse email" value="${savedEmail}" ${emailReadonly} />
       <button class="premium-subscribe" onclick="subscribePremium()">S\u2019abonner</button>
       <p class="premium-legal">Paiement s\u00e9curis\u00e9 via Stripe. Annulable \u00e0 tout moment.</p>
