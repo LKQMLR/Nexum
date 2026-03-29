@@ -87,43 +87,9 @@ function showLimitAlert(_, message) {
 
 // ── Vérifier le statut premium au lancement ──
 function initPremium() {
-  // Vérifier si email propriétaire
-  const ownerEmail = localStorage.getItem('cargo_premium_email');
-  if (ownerEmail) {
-    isOwnerEmail(ownerEmail).then(isOwner => {
-      if (isOwner) { _premiumVerified = true; applyPremium(true); }
-    });
-  }
-
-  // Par défaut : pas premium
+  // Par défaut : pas premium — l'auth listener déclenche checkPremiumStatus si l'utilisateur est connecté
   _premiumVerified = false;
   applyPremium(false);
-
-  // Vérifier si on revient d'un paiement réussi
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('premium') === 'success') {
-    window.history.replaceState({}, '', window.location.pathname);
-    // Récupérer l'email temporaire (localStorage car sessionStorage peut être perdu après redirect)
-    const pendingEmail = localStorage.getItem('cargo_pending_email');
-    if (pendingEmail) {
-      localStorage.setItem('cargo_premium_email', pendingEmail);
-      localStorage.removeItem('cargo_pending_email');
-    }
-    const confirmedEmail = localStorage.getItem('cargo_premium_email');
-    if (confirmedEmail) {
-      checkPremiumStatus(confirmedEmail);
-      showStatus('success', 'Vérification de votre abonnement...');
-    }
-  } else if (params.get('premium') === 'cancel') {
-    window.history.replaceState({}, '', window.location.pathname);
-    localStorage.removeItem('cargo_pending_email');
-  }
-
-  // Vérifier côté serveur si on a un email enregistré
-  const email = localStorage.getItem('cargo_premium_email');
-  if (email) {
-    checkPremiumStatus(email);
-  }
 }
 
 // ── Vérifier l'abonnement côté serveur ──
@@ -208,7 +174,9 @@ function showPremiumModal() {
   const old = document.getElementById('premium-modal');
   if (old) old.remove();
 
-  const savedEmail = escHtml(localStorage.getItem('cargo_premium_email') || '');
+  const authUser = typeof getAuthUser === 'function' ? getAuthUser() : null;
+  const savedEmail = escHtml(authUser?.email || '');
+  const emailReadonly = authUser ? 'readonly style="opacity:.6;cursor:default"' : '';
 
   const modal = document.createElement('div');
   modal.id = 'premium-modal';
@@ -243,7 +211,7 @@ function showPremiumModal() {
           </ul>
         </div>
       </div>
-      <input type="email" id="premium-email" placeholder="Votre adresse email" value="${savedEmail}" />
+      <input type="email" id="premium-email" placeholder="Votre adresse email" value="${savedEmail}" ${emailReadonly} />
       <button class="premium-subscribe" onclick="subscribePremium()">S'abonner</button>
       <p class="premium-legal">Paiement s\u00e9curis\u00e9 via Stripe. Annulable \u00e0 tout moment.</p>
     </div>
@@ -267,26 +235,24 @@ function isValidEmail(email) {
 
 // ── Lancer le paiement Stripe ──
 async function subscribePremium() {
+  // Priorité à l'email du compte connecté
+  const authUser = typeof getAuthUser === 'function' ? getAuthUser() : null;
   const emailInput = document.getElementById('premium-email');
-  const email = emailInput.value.trim();
+  const email = authUser ? authUser.email : emailInput?.value.trim();
 
   if (!email || !isValidEmail(email)) {
-    emailInput.style.borderColor = '#ef4444';
+    if (emailInput) emailInput.style.borderColor = '#ef4444';
     return;
   }
 
   // Bypass propriétaire : activer premium sans payer
   if (await isOwnerEmail(email)) {
-    localStorage.setItem('cargo_premium_email', email);
     _premiumVerified = true;
     applyPremium(true);
     closePremiumModal();
     showStatus('success', 'Premium activ\u00e9 !');
     return;
   }
-
-  // Sauver dans localStorage (survit aux redirections cross-origin, contrairement à sessionStorage)
-  localStorage.setItem('cargo_pending_email', email);
 
   const btn = document.querySelector('.premium-subscribe');
   btn.textContent = 'Redirection...';
@@ -306,21 +272,20 @@ async function subscribePremium() {
   } catch (err) {
     btn.textContent = "S'abonner";
     btn.disabled = false;
-    localStorage.removeItem('cargo_pending_email');
     showStatus('error', 'Erreur paiement : ' + (err.message || 'connexion impossible'));
   }
 }
 
 // ── Gérer l'abonnement existant ──
 async function managePremium() {
-  const email = localStorage.getItem('cargo_premium_email');
+  const authUser = typeof getAuthUser === 'function' ? getAuthUser() : null;
+  const email = authUser?.email;
   if (!email) {
-    showStatus('error', 'Aucun email associé au premium');
+    showStatus('error', 'Connectez-vous pour gérer votre abonnement.');
     return;
   }
   // Les emails owner : toggle premium on/off
   if (await isOwnerEmail(email)) {
-    localStorage.removeItem('cargo_premium_email');
     _premiumVerified = false;
     applyPremium(false);
     showStatus('success', 'Premium d\u00e9sactiv\u00e9. Cliquez sur "Passer Premium" pour r\u00e9activer.');

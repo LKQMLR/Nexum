@@ -309,4 +309,57 @@ button:not(:disabled):hover { opacity: .85; transform: translateY(-1px); }
   -webkit-user-select: none; user-select: none;
 }
 .help-btn:active { background: var(--accent); }
+
+/* ── HEADER COMPTE ── */
+.header-bottom-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 3px;
+}
+.header-bottom-row p { margin: 0; }
+#btn-account {
+  font-size: .62rem; padding: 4px 9px;
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.18);
+  border-radius: 20px; color: rgba(255,255,255,.65); cursor: pointer;
+  white-space: nowrap; max-width: 140px; overflow: hidden; text-overflow: ellipsis;
+  flex-shrink: 0; transition: border-color .2s, color .2s;
+}
+#btn-account:hover { border-color: rgba(255,255,255,.4); color: #fff; }
+#btn-account.logged-in { border-color: var(--accent); color: var(--accent); }
+
+/* ── MENU COMPTE ── */
+.account-menu {
+  position: fixed; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 6px; z-index: 10020; min-width: 200px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.5);
+}
+.account-menu-email {
+  padding: 6px 10px 8px; font-size: .68rem; color: var(--text2);
+  border-bottom: 1px solid var(--border); margin-bottom: 4px;
+  word-break: break-all;
+}
+.account-menu-btn {
+  width: 100%; text-align: left; padding: 7px 10px;
+  background: none; border: none; font-size: .75rem; cursor: pointer; border-radius: 6px;
+}
+.account-menu-logout { color: var(--red); }
+.account-menu-logout:hover { background: var(--red-bg); }
+
+/* ── MODALE AUTH ── */
+.auth-box { gap: 8px; }
+.auth-tabs { display: flex; gap: 4px; margin-bottom: 4px; }
+.auth-tab {
+  flex: 1; padding: 7px; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text2); font-size: .75rem; cursor: pointer;
+  transition: background .2s, color .2s;
+}
+.auth-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.auth-error {
+  font-size: .72rem; padding: 6px 10px; background: var(--red-bg);
+  border-radius: 8px; color: var(--red); line-height: 1.4;
+}
+#auth-email, #auth-password {
+  width: 100%; padding: 9px 12px; background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 8px; color: var(--text); font-size: .82rem; box-sizing: border-box;
+  outline: none; transition: border-color .2s;
+}
+#auth-email:focus, #auth-password:focus { border-color: var(--accent); }
 .prox-tooltip.show { display: block !important; }

@@ -115,7 +115,8 @@ function initApp() {
   restoreSession();
   if (typeof checkSharedRoute === 'function') checkSharedRoute();
 
-  // Initialiser le système premium
+  // Initialiser l'authentification puis le système premium
+  if (typeof initAuth === 'function') initAuth();
   if (typeof initPremium === 'function') initPremium();
 }
 

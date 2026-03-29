@@ -1,10 +1,10 @@
-const CACHE = 'cargo-v154';
+const CACHE = 'cargo-v155';
 const ASSETS = [
   './index.html', './manifest.json',
   './css/variables.css', './css/layout.css', './css/components.css',
   './css/deliveries.css', './css/navigation.css', './css/route.css',
   './css/premium.css',
-  './js/app.js', './js/map.js', './js/geocoding.js',
+  './js/auth.js', './js/app.js', './js/map.js', './js/geocoding.js',
   './js/deliveries.js', './js/optimizer.js', './js/route.js',
   './js/navigation.js', './js/simulation.js', './js/premium.js',
   './js/history.js', './js/lz-string.min.js',
