@@ -35,7 +35,7 @@ function isPremium() {
 
 // ── Limites par plan ──
 const FREE_LIMITS = {
-  maxAddresses: 20,
+  maxAddresses: 10,
   maxSectors: 2,      // secteurs 1 et 2
   maxLocks: 1,
   proximityAlerts: false,
@@ -78,7 +78,7 @@ function showLimitAlert(_, message) {
   const now = Date.now();
   if (now - _lastLimitAlert < 2000) return; // Anti-spam
   _lastLimitAlert = now;
-  showStatus('error', message + ' Découvrez l\'offre Premium.');
+  showStatus('error', message + ' Découvrez l\'offre Standard.');
   const btn = document.getElementById('btn-premium');
   if (btn) {
     btn.classList.remove('premium-pulse');
@@ -163,11 +163,11 @@ function updatePremiumUI(isPremium) {
   const premium = typeof isPremium === 'boolean' ? isPremium : _premiumVerified;
 
   if (premium) {
-    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Premium actif — G\u00e9rer';
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Standard actif — G\u00e9rer';
     btn.classList.add('premium-active');
     btn.onclick = managePremium;
   } else {
-    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Passer Premium';
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Passer Standard';
     btn.classList.remove('premium-active');
     btn.onclick = showPremiumModal;
   }
@@ -198,13 +198,13 @@ function showPremiumModal() {
       <div class="premium-icon">
         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       </div>
-      <h3>CarGo Premium</h3>
-      <p class="premium-price">11,99\u20ac<span>/mois</span></p>
+      <h3>CarGo Standard</h3>
+      <p class="premium-price">12,99\u20ac<span>/mois</span></p>
       <div class="premium-compare">
         <div class="premium-col">
           <div class="premium-col-title">Gratuit</div>
           <ul>
-            <li>20 adresses max</li>
+            <li>10 adresses max</li>
             <li>Secteurs 1 et 2</li>
             <li>1 verrouillage</li>
             <li class="premium-no">Alertes de proximit\u00e9</li>
@@ -212,7 +212,7 @@ function showPremiumModal() {
           </ul>
         </div>
         <div class="premium-col premium-col-pro">
-          <div class="premium-col-title">Premium</div>
+          <div class="premium-col-title">Standard</div>
           <ul>
             <li>Adresses illimit\u00e9es</li>
             <li>Tous les secteurs</li>
