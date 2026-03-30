@@ -47,6 +47,16 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
+window.addEventListener('load', () => {
+  if (window.location.hash === '#subscribe') {
+    history.replaceState(null, '', window.location.pathname);
+    // Attendre que l'auth soit prête avant d'ouvrir la modale
+    setTimeout(() => {
+      if (typeof showPremiumModal === 'function') showPremiumModal();
+    }, 800);
+  }
+});
+
 function initApp() {
   const dot = document.getElementById('api-dot');
   dot.classList.remove('off'); dot.classList.add('on');
