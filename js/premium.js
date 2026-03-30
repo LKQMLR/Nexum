@@ -163,6 +163,7 @@ function escHtml(s) {
 function showPremiumModal() {
   const authUser = typeof getAuthUser === 'function' ? getAuthUser() : null;
   if (!authUser) {
+    window._pendingSubscribe = true;
     if (typeof openAuthModal === 'function') openAuthModal('signup');
     if (typeof showStatus === 'function') showStatus('success', 'Créez un compte gratuit pour accéder aux formules d\'abonnement.');
     return;

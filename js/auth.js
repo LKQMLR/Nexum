@@ -435,6 +435,10 @@ async function submitAuth(tab) {
 
   closeAuthModal();
   if (typeof showStatus === 'function') showStatus('success', 'Connecté !');
+  if (window._pendingSubscribe) {
+    window._pendingSubscribe = false;
+    setTimeout(() => { if (typeof showPremiumModal === 'function') showPremiumModal(); }, 600);
+  }
 }
 
 function _showAuthError(el, msg) {
