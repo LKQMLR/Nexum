@@ -63,19 +63,30 @@ function displayRoute(stops) {
       const path = [];
       allResults.forEach(r => { r.routes[0].overview_path.forEach(p => path.push(p)); });
       if (state._routePoly) state._routePoly.setMap(null);
+      if (state._routePolyGlow) state._routePolyGlow.setMap(null);
       if (state._routePolyPreview) state._routePolyPreview.setMap(null);
       const arrowIcon = { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW, scale: 2.5, strokeColor: '#fff', strokeWeight: 1, fillColor: '#fff', fillOpacity: 0.9 };
+      // Halo sous le trajet principal
+      state._routePolyGlow = new google.maps.Polyline({
+        path, map: state.map, strokeColor: '#4f8cff', strokeWeight: 16, strokeOpacity: 0.12, zIndex: 1
+      });
       state._routePoly = new google.maps.Polyline({
-        path, map: state.map, strokeColor: '#4f8cff', strokeWeight: 5, strokeOpacity: 0.9,
-        icons: [{ icon: arrowIcon, offset: '0', repeat: '80px' }]
+        path, map: state.map, strokeColor: '#4f8cff', strokeWeight: 5, strokeOpacity: 0.95,
+        icons: [{ icon: arrowIcon, offset: '0', repeat: '80px' }], zIndex: 2
       });
       if (state.previewMap) {
         state._routePolyPreview = new google.maps.Polyline({
-          path, map: state.previewMap, strokeColor: '#4f8cff', strokeWeight: 3, strokeOpacity: 0.9
+          path, map: state.previewMap, strokeColor: '#4f8cff', strokeWeight: 4, strokeOpacity: 1
         });
         const bounds = new google.maps.LatLngBounds();
         path.forEach(p => bounds.extend(p));
-        state.previewMap.fitBounds(bounds, 16);
+        state._routeBounds = bounds;
+        state.previewMap.fitBounds(bounds, 20);
+        // Verrouiller l'aperçu sur le trajet — re-cadre si l'utilisateur déplace
+        google.maps.event.clearListeners(state.previewMap, 'idle');
+        state.previewMap.addListener('idle', () => {
+          if (state._routeBounds) state.previewMap.fitBounds(state._routeBounds, 20);
+        });
       }
 
       // Placer les markers

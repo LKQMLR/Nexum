@@ -346,7 +346,9 @@ function resetAll() {
   if (state.previewRenderer) state.previewRenderer.setDirections({ routes: [] });
   if (state.startPoint?.marker) { state.startPoint.marker.setMap(null); }
   if (state._routePoly) { state._routePoly.setMap(null); state._routePoly = null; }
+  if (state._routePolyGlow) { state._routePolyGlow.setMap(null); state._routePolyGlow = null; }
   if (state._routePolyPreview) { state._routePolyPreview.setMap(null); state._routePolyPreview = null; }
+  if (state.previewMap) { google.maps.event.clearListeners(state.previewMap, 'idle'); state._routeBounds = null; }
   if (state._completedPoly) { state._completedPoly.setMap(null); state._completedPoly = null; }
   state.startPoint = null;
   state.deliveries.forEach(d => { if (d.marker) d.marker.setMap(null); });
