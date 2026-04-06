@@ -348,7 +348,10 @@ function resetAll() {
   if (state._routePoly) { state._routePoly.setMap(null); state._routePoly = null; }
   if (state._routePolyGlow) { state._routePolyGlow.setMap(null); state._routePolyGlow = null; }
   if (state._routePolyPreview) { state._routePolyPreview.setMap(null); state._routePolyPreview = null; }
-  if (state.previewMap) { state._routeBounds = null; }
+  if (state.previewMap) {
+    state._routeBounds = null;
+    if (state._routeLabels) { state._routeLabels.forEach(l => l.setMap(null)); state._routeLabels = []; }
+  }
   if (state._completedPoly) { state._completedPoly.setMap(null); state._completedPoly = null; }
   state.startPoint = null;
   state.deliveries.forEach(d => { if (d.marker) d.marker.setMap(null); });

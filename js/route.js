@@ -6,6 +6,27 @@
 // Couleurs par secteur pour les markers
 const SECTOR_COLS = { 0: '#8896a7', 1: '#3b82f6', 2: '#0d9488', 3: '#d97706', 4: '#db2777', 5: '#7c3aed' };
 
+// ── LABEL RUE SUR CARTE APERÇU ──
+class RouteStreetLabel extends google.maps.OverlayView {
+  constructor(position, text, map) {
+    super();
+    this._pos = position;
+    this._text = text;
+    this.setMap(map);
+  }
+  onAdd() {
+    this._div = document.createElement('div');
+    this._div.style.cssText = 'position:absolute;background:rgba(255,255,255,0.88);padding:1px 5px;border-radius:3px;font-size:8px;font-weight:700;color:#333;white-space:nowrap;pointer-events:none;transform:translate(-50%,-50%);box-shadow:0 1px 3px rgba(0,0,0,.15)';
+    this._div.textContent = this._text;
+    this.getPanes().overlayLayer.appendChild(this._div);
+  }
+  draw() {
+    const p = this.getProjection().fromLatLngToDivPixel(this._pos);
+    if (p) { this._div.style.left = p.x + 'px'; this._div.style.top = p.y + 'px'; }
+  }
+  onRemove() { if (this._div) { this._div.parentNode?.removeChild(this._div); this._div = null; } }
+}
+
 // ── TRACÉ DE L'ITINÉRAIRE ──
 function displayRoute(stops) {
   setUIBusy(true); showStatus('loading', 'Tracé...');
@@ -88,6 +109,24 @@ function displayRoute(stops) {
           state.previewMap.fitBounds(bounds, 20);
         });
         state.previewMap.fitBounds(bounds, 20);
+
+        // Labels noms de rues du trajet
+        if (state._routeLabels) { state._routeLabels.forEach(l => l.setMap(null)); }
+        state._routeLabels = [];
+        const seen = new Set();
+        allLegs.forEach(leg => {
+          leg.steps.forEach(step => {
+            if (step.distance.value < 80) return;
+            const match = step.instructions.match(/<b>(.*?)<\/b>/);
+            if (!match) return;
+            const name = match[1].replace(/<[^>]+>/g, '').trim();
+            if (!name || seen.has(name)) return;
+            seen.add(name);
+            const midIdx = Math.floor(step.path.length / 2);
+            const pos = step.path[midIdx] || step.start_location;
+            state._routeLabels.push(new RouteStreetLabel(pos, name, state.previewMap));
+          });
+        });
       }
 
       // Placer les markers
