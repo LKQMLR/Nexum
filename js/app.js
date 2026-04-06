@@ -90,14 +90,16 @@ function initApp() {
       styles: [
         { featureType: 'poi',     stylers: [{ visibility: 'off' }] },
         { featureType: 'transit', stylers: [{ visibility: 'off' }] },
-        { featureType: 'road',                elementType: 'geometry.fill',   stylers: [{ color: '#d8d8d8' }] },
-        { featureType: 'road',                elementType: 'geometry.stroke', stylers: [{ color: '#e4e4e4' }] },
-        { featureType: 'road.highway',        elementType: 'geometry.fill',   stylers: [{ color: '#c8c8c8' }] },
-        { featureType: 'road.highway',        elementType: 'geometry.stroke', stylers: [{ color: '#d4d4d4' }] },
+        { featureType: 'road.local',           stylers:                        [{ visibility: 'off' }] },
+        { featureType: 'road.arterial',       stylers:                        [{ visibility: 'off' }] },
+        { featureType: 'road.highway',        elementType: 'geometry.fill',   stylers: [{ color: '#e2e2e2' }] },
+        { featureType: 'road.highway',        elementType: 'geometry.stroke', stylers: [{ color: '#ececec' }] },
         { featureType: 'road',                elementType: 'labels',          stylers: [{ visibility: 'off' }] },
         { featureType: 'administrative',      elementType: 'labels',          stylers: [{ visibility: 'off' }] },
-        { featureType: 'landscape',           elementType: 'geometry',        stylers: [{ color: '#f5f5f5' }] },
-        { featureType: 'water',               elementType: 'geometry',        stylers: [{ color: '#c9e4f5' }] },
+        { featureType: 'poi',                 stylers:                        [{ visibility: 'off' }] },
+        { featureType: 'transit',             stylers:                        [{ visibility: 'off' }] },
+        { featureType: 'landscape',           elementType: 'geometry',        stylers: [{ color: '#f2f2f2' }] },
+        { featureType: 'water',               elementType: 'geometry',        stylers: [{ color: '#d4eaf5' }] },
       ],
     });
     state.previewRenderer = new google.maps.DirectionsRenderer({
