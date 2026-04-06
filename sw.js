@@ -1,4 +1,4 @@
-const CACHE = 'cargo-v203';
+const CACHE = 'cargo-v204';
 const ASSETS = [
   './index.html', './manifest.json',
   './css/variables.css', './css/layout.css', './css/components.css',

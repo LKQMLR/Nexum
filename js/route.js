@@ -79,10 +79,14 @@ function displayRoute(stops) {
         state._routePolyPreview = new google.maps.Polyline({
           path, map: state.previewMap, strokeColor: '#4f8cff', strokeWeight: 4, strokeOpacity: 1
         });
-        // Bounds : trajet complet pour le cadrage initial
+        // Bounds : trajet complet, cadrage initial puis zoom libre
         const bounds = new google.maps.LatLngBounds();
         path.forEach(p => bounds.extend(p));
         state._routeBounds = bounds;
+        google.maps.event.clearListeners(state.previewMap, 'idle');
+        google.maps.event.addListenerOnce(state.previewMap, 'idle', () => {
+          state.previewMap.fitBounds(bounds, 20);
+        });
         state.previewMap.fitBounds(bounds, 20);
       }
 
