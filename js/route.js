@@ -7,24 +7,22 @@
 const SECTOR_COLS = { 0: '#8896a7', 1: '#3b82f6', 2: '#0d9488', 3: '#d97706', 4: '#db2777', 5: '#7c3aed' };
 
 // ── LABEL RUE SUR CARTE APERÇU ──
-class RouteStreetLabel extends google.maps.OverlayView {
-  constructor(position, text, map) {
-    super();
-    this._pos = position;
-    this._text = text;
-    this.setMap(map);
-  }
-  onAdd() {
-    this._div = document.createElement('div');
-    this._div.style.cssText = 'position:absolute;background:rgba(255,255,255,0.88);padding:1px 5px;border-radius:3px;font-size:8px;font-weight:700;color:#333;white-space:nowrap;pointer-events:none;transform:translate(-50%,-50%);box-shadow:0 1px 3px rgba(0,0,0,.15)';
-    this._div.textContent = this._text;
-    this.getPanes().overlayLayer.appendChild(this._div);
-  }
-  draw() {
-    const p = this.getProjection().fromLatLngToDivPixel(this._pos);
-    if (p) { this._div.style.left = p.x + 'px'; this._div.style.top = p.y + 'px'; }
-  }
-  onRemove() { if (this._div) { this._div.parentNode?.removeChild(this._div); this._div = null; } }
+function makeRouteStreetLabel(position, text, map) {
+  const overlay = new google.maps.OverlayView();
+  let div;
+  overlay.onAdd = function() {
+    div = document.createElement('div');
+    div.style.cssText = 'position:absolute;background:rgba(255,255,255,0.88);padding:1px 5px;border-radius:3px;font-size:8px;font-weight:700;color:#333;white-space:nowrap;pointer-events:none;transform:translate(-50%,-50%);box-shadow:0 1px 3px rgba(0,0,0,.15)';
+    div.textContent = text;
+    overlay.getPanes().overlayLayer.appendChild(div);
+  };
+  overlay.draw = function() {
+    const p = overlay.getProjection().fromLatLngToDivPixel(position);
+    if (p && div) { div.style.left = p.x + 'px'; div.style.top = p.y + 'px'; }
+  };
+  overlay.onRemove = function() { if (div) { div.parentNode?.removeChild(div); div = null; } };
+  overlay.setMap(map);
+  return overlay;
 }
 
 // ── TRACÉ DE L'ITINÉRAIRE ──
@@ -124,7 +122,7 @@ function displayRoute(stops) {
             seen.add(name);
             const midIdx = Math.floor(step.path.length / 2);
             const pos = step.path[midIdx] || step.start_location;
-            state._routeLabels.push(new RouteStreetLabel(pos, name, state.previewMap));
+            state._routeLabels.push(makeRouteStreetLabel(pos, name, state.previewMap));
           });
         });
       }
