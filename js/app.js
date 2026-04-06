@@ -85,7 +85,7 @@ function initApp() {
   if (window.innerWidth <= 768) {
     state.previewMap = new google.maps.Map(document.getElementById('map-preview'), {
       center: state.map.getCenter(), zoom: state.map.getZoom(),
-      disableDefaultUI: true, gestureHandling: 'none', clickableIcons: false,
+      disableDefaultUI: true, gestureHandling: 'greedy', clickableIcons: false,
       tilt: 0,
       styles: [
         { featureType: 'poi',     stylers: [{ visibility: 'off' }] },
@@ -348,7 +348,7 @@ function resetAll() {
   if (state._routePoly) { state._routePoly.setMap(null); state._routePoly = null; }
   if (state._routePolyGlow) { state._routePolyGlow.setMap(null); state._routePolyGlow = null; }
   if (state._routePolyPreview) { state._routePolyPreview.setMap(null); state._routePolyPreview = null; }
-  if (state.previewMap) { google.maps.event.clearListeners(state.previewMap, 'idle'); state._routeBounds = null; }
+  if (state.previewMap) { state._routeBounds = null; }
   if (state._completedPoly) { state._completedPoly.setMap(null); state._completedPoly = null; }
   state.startPoint = null;
   state.deliveries.forEach(d => { if (d.marker) d.marker.setMap(null); });

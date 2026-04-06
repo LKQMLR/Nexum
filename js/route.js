@@ -79,16 +79,11 @@ function displayRoute(stops) {
         state._routePolyPreview = new google.maps.Polyline({
           path, map: state.previewMap, strokeColor: '#4f8cff', strokeWeight: 4, strokeOpacity: 1
         });
-        // Bounds : uniquement point 1 → dernier point (exclut le point de départ)
+        // Bounds : trajet complet pour le cadrage initial
         const bounds = new google.maps.LatLngBounds();
-        stops.slice(1).forEach(s => bounds.extend({ lat: s.lat, lng: s.lng }));
+        path.forEach(p => bounds.extend(p));
         state._routeBounds = bounds;
-        state.previewMap.fitBounds(bounds, 32);
-        // Verrouiller l'aperçu sur le trajet — re-cadre si l'utilisateur déplace
-        google.maps.event.clearListeners(state.previewMap, 'idle');
-        state.previewMap.addListener('idle', () => {
-          if (state._routeBounds) state.previewMap.fitBounds(state._routeBounds, 20);
-        });
+        state.previewMap.fitBounds(bounds, 20);
       }
 
       // Placer les markers
