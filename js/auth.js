@@ -20,6 +20,10 @@ function initAuth() {
     if (_authUser) {
       fetchProfile(_authUser.id);
       if (typeof checkPremiumStatus === 'function') checkPremiumStatus(_authUser.email);
+      if (window._pendingSubscribe && (event === 'SIGNED_IN' || event === 'USER_UPDATED')) {
+        window._pendingSubscribe = false;
+        setTimeout(() => { if (typeof showPremiumModal === 'function') showPremiumModal(); }, 300);
+      }
       // Re-vérification premium périodique toutes les 10 minutes
       if (window._premiumRecheck) clearInterval(window._premiumRecheck);
       window._premiumRecheck = setInterval(() => {
@@ -435,10 +439,6 @@ async function submitAuth(tab) {
 
   closeAuthModal();
   if (typeof showStatus === 'function') showStatus('success', 'Connecté !');
-  if (window._pendingSubscribe) {
-    window._pendingSubscribe = false;
-    setTimeout(() => { if (typeof showPremiumModal === 'function') showPremiumModal(); }, 600);
-  }
 }
 
 function _showAuthError(el, msg) {

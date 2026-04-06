@@ -86,10 +86,23 @@ function initApp() {
     state.previewMap = new google.maps.Map(document.getElementById('map-preview'), {
       center: state.map.getCenter(), zoom: state.map.getZoom(),
       disableDefaultUI: true, gestureHandling: 'none', clickableIcons: false,
+      tilt: 0,
+      styles: [
+        { featureType: 'poi',     stylers: [{ visibility: 'off' }] },
+        { featureType: 'transit', stylers: [{ visibility: 'off' }] },
+        { featureType: 'road',                elementType: 'geometry.fill',   stylers: [{ color: '#d8d8d8' }] },
+        { featureType: 'road',                elementType: 'geometry.stroke', stylers: [{ color: '#e4e4e4' }] },
+        { featureType: 'road.highway',        elementType: 'geometry.fill',   stylers: [{ color: '#c8c8c8' }] },
+        { featureType: 'road.highway',        elementType: 'geometry.stroke', stylers: [{ color: '#d4d4d4' }] },
+        { featureType: 'road',                elementType: 'labels',          stylers: [{ visibility: 'off' }] },
+        { featureType: 'administrative',      elementType: 'labels',          stylers: [{ visibility: 'off' }] },
+        { featureType: 'landscape',           elementType: 'geometry',        stylers: [{ color: '#f5f5f5' }] },
+        { featureType: 'water',               elementType: 'geometry',        stylers: [{ color: '#c9e4f5' }] },
+      ],
     });
     state.previewRenderer = new google.maps.DirectionsRenderer({
       map: state.previewMap, suppressMarkers: true,
-      polylineOptions: { strokeColor: '#4f8cff', strokeWeight: 3, strokeOpacity: 0.9 },
+      polylineOptions: { strokeColor: '#4f8cff', strokeWeight: 4, strokeOpacity: 1 },
     });
     state.map.addListener('bounds_changed', () => {
       state.previewMap.setCenter(state.map.getCenter());
