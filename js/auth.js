@@ -429,6 +429,15 @@ async function submitAuth(tab) {
     return;
   }
 
+  if (tab === 'signup' && user && user.identities?.length === 0) {
+    btn.disabled = false;
+    btn.textContent = 'Créer mon compte';
+    errEl.innerHTML = 'Cet email est déjà utilisé. <span style="text-decoration:underline;cursor:pointer;color:var(--accent)" onclick="openAuthModal(\'signin\')">Se connecter ?</span>';
+    errEl.style.color = '';
+    errEl.style.display = 'block';
+    return;
+  }
+
   if (tab === 'signup' && user && !user.email_confirmed_at) {
     errEl.style.color = 'var(--green)';
     errEl.textContent = 'Vérifie ton email pour confirmer ton compte.';
