@@ -196,19 +196,9 @@ button:not(:disabled):hover { opacity: .85; transform: translateY(-1px); }
   100% { transform: translateY(-50%) scale(1); }
 }
 
-/* ── BOUTON FAVORIS GAUCHE + CROIX DROITE (delivery-input) ── */
+/* ── CROIX CLEAR DROITE (delivery-input) ── */
 .delivery-input-wrapper { position: relative; }
-.delivery-input-wrapper #delivery-input { padding-left: 36px; padding-right: 34px; }
-
-.input-fav-btn {
-  position: absolute; left: 7px; top: 50%; transform: translateY(-50%);
-  background: transparent !important; border: none !important;
-  box-shadow: none !important; padding: 3px; z-index: 2;
-  opacity: .4; cursor: pointer; line-height: 0;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--text2); transition: opacity .2s; border-radius: 0 !important;
-}
-.input-fav-btn:hover { opacity: .85 !important; background: transparent !important; transform: translateY(-50%) !important; }
+.delivery-input-wrapper #delivery-input { padding-right: 34px; }
 
 .input-clear-btn {
   position: absolute; right: 7px; top: 50%; transform: translateY(-50%);
