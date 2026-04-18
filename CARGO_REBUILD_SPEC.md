@@ -313,18 +313,31 @@ Appeler `initAutocomplete()` depuis `initApp()` après initialisation Maps.
 
 **Structure du champ d'ajout d'adresse** (`delivery-input`) :
 
-Le champ a trois éléments dans un `input-wrapper` :
-- **Bouton étoile à gauche** : clic → ouvre le dropdown favoris/récents (`showFreqDropdown`)
-- **Input texte** : padding-left et padding-right ajustés pour les deux boutons
-- **Croix en cercle à droite** : visible uniquement quand le champ a du texte, vide le champ
+Le champ est dans un `input-wrapper delivery-input-wrapper` avec une croix clear à droite :
 
 ```html
 <div class="input-wrapper delivery-input-wrapper">
-  <button class="input-fav-btn" onclick="showFreqDropdown('delivery-input','freq-delivery')"><!-- étoile SVG --></button>
   <input type="text" id="delivery-input" placeholder="Ajouter une adresse..." />
   <button class="input-clear-btn" id="delivery-clear" onclick="clearDeliveryInput()" style="display:none"><!-- × SVG --></button>
   <div class="freq-dropdown" id="freq-delivery"></div>
 </div>
+```
+
+**Style du champ** — plus grand et plus visible que les autres inputs :
+```css
+#delivery-input {
+  padding: 11px 34px 11px 13px;
+  font-size: .9rem;
+  border: 1.5px solid rgba(255,255,255,0.13);
+  border-radius: 10px;
+  background: var(--surface2);
+  box-shadow: 0 1px 6px rgba(0,0,0,.18);
+  transition: border-color .2s, box-shadow .2s;
+}
+#delivery-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(79,140,255,.13);
+}
 ```
 
 ```javascript
