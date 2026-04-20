@@ -21,7 +21,7 @@ function makeDestLabel(position, text, map) {
     if (p && div) { div.style.left = p.x + 'px'; div.style.top = p.y + 'px'; }
   };
   overlay.onRemove = function() { if (div) { div.parentNode?.removeChild(div); div = null; } };
-  overlay.setVisible = function(v) { if (div) div.style.display = v ? 'block' : 'none'; };
+  overlay.setOpacity = function(o) { if (div) { div.style.opacity = o; div.style.display = o > 0 ? 'block' : 'none'; } };
   overlay.setMap(map);
   return overlay;
 }
@@ -117,12 +117,18 @@ function displayRoute(stops) {
           const short = (s.address || '').replace(/,.*$/, '').trim().substring(0, 22);
           if (short) state._routeLabels.push(makeDestLabel({ lat: s.lat, lng: s.lng }, short, state.previewMap));
         });
-        state._routeLabels.forEach(l => l.setVisible(false));
+        state._routeLabels.forEach(l => l.setOpacity(0));
         const _syncLabelVis = () => {
-          const show = state.previewMap.getZoom() >= 13;
-          state._routeLabels.forEach(l => l.setVisible(show));
+          const zoom = state.previewMap.getZoom();
+          // opacité 0 en dessous de zoom 11, pleine à zoom 14+
+          const opacity = Math.max(0, Math.min(1, (zoom - 11) / 3));
+          state._routeLabels.forEach(l => l.setOpacity(opacity));
         };
-        state._routeLabelZoomListener = state.previewMap.addListener('zoom_changed', _syncLabelVis);
+        // Attendre que fitBounds soit stabilisé avant d'activer le listener
+        google.maps.event.addListenerOnce(state.previewMap, 'idle', () => {
+          state._routeLabels.forEach(l => l.setOpacity(0));
+          state._routeLabelZoomListener = state.previewMap.addListener('zoom_changed', _syncLabelVis);
+        });
       }
 
       // Placer les markers
