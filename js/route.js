@@ -21,6 +21,7 @@ function makeDestLabel(position, text, map) {
     if (p && div) { div.style.left = p.x + 'px'; div.style.top = p.y + 'px'; }
   };
   overlay.onRemove = function() { if (div) { div.parentNode?.removeChild(div); div = null; } };
+  overlay.setVisible = function(v) { if (div) div.style.display = v ? 'block' : 'none'; };
   overlay.setMap(map);
   return overlay;
 }
@@ -108,13 +109,20 @@ function displayRoute(stops) {
         });
         state.previewMap.fitBounds(bounds, 20);
 
-        // Labels destination sous chaque marqueur de la preview
+        // Labels destination sous chaque marqueur de la preview — visibles seulement si zoom >= 13
         if (state._routeLabels) { state._routeLabels.forEach(l => l.setMap(null)); }
+        if (state._routeLabelZoomListener) { google.maps.event.removeListener(state._routeLabelZoomListener); }
         state._routeLabels = [];
         stops.slice(1).forEach(s => {
           const short = (s.address || '').replace(/,.*$/, '').trim().substring(0, 22);
           if (short) state._routeLabels.push(makeDestLabel({ lat: s.lat, lng: s.lng }, short, state.previewMap));
         });
+        const _syncLabelVis = () => {
+          const show = state.previewMap.getZoom() >= 13;
+          state._routeLabels.forEach(l => l.setVisible(show));
+        };
+        _syncLabelVis();
+        state._routeLabelZoomListener = state.previewMap.addListener('zoom_changed', _syncLabelVis);
       }
 
       // Placer les markers

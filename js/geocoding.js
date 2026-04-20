@@ -48,7 +48,7 @@ function updateAutocompleteBias() {
     { lat: center.lat + offset, lng: center.lng + offset }
   );
   const el = document.getElementById('delivery-input');
-  if (el._autocomplete) { el._autocomplete.setBounds(b); el._autocomplete.setOptions({ strictBounds: true }); }
+  if (el._autocomplete) { el._autocomplete.setBounds(b); el._autocomplete.setOptions({ strictBounds: false }); }
 }
 
 // ── GÉOCODAGE ──
