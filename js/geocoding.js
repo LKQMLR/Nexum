@@ -38,17 +38,14 @@ function setupAutocomplete(inputId) {
   }
 }
 
-// ── BIAIS AUTOCOMPLETE (~30km autour du départ) ──
+// ── BIAIS AUTOCOMPLETE (proximity soft-bias, toutes adresses FR accessibles) ──
 function updateAutocompleteBias() {
   if (!state.startPoint) return;
-  const center = { lat: state.startPoint.lat, lng: state.startPoint.lng };
-  const offset = 0.27; // ~30km
-  const b = new google.maps.LatLngBounds(
-    { lat: center.lat - offset, lng: center.lng - offset },
-    { lat: center.lat + offset, lng: center.lng + offset }
-  );
+  const center = new google.maps.LatLng(state.startPoint.lat, state.startPoint.lng);
   const el = document.getElementById('delivery-input');
-  if (el._autocomplete) { el._autocomplete.setBounds(b); el._autocomplete.setOptions({ strictBounds: false }); }
+  if (el._autocomplete) {
+    el._autocomplete.setOptions({ location: center, radius: 30000, strictBounds: false });
+  }
 }
 
 // ── GÉOCODAGE ──

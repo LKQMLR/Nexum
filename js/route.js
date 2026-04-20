@@ -117,11 +117,11 @@ function displayRoute(stops) {
           const short = (s.address || '').replace(/,.*$/, '').trim().substring(0, 22);
           if (short) state._routeLabels.push(makeDestLabel({ lat: s.lat, lng: s.lng }, short, state.previewMap));
         });
+        state._routeLabels.forEach(l => l.setVisible(false));
         const _syncLabelVis = () => {
           const show = state.previewMap.getZoom() >= 13;
           state._routeLabels.forEach(l => l.setVisible(show));
         };
-        _syncLabelVis();
         state._routeLabelZoomListener = state.previewMap.addListener('zoom_changed', _syncLabelVis);
       }
 
