@@ -282,3 +282,11 @@ function _updateOverlayClear() {
   const input = document.getElementById('delivery-overlay-input');
   if (btn) btn.style.display = input.value.trim() ? 'flex' : 'none';
 }
+
+function submitDeliveryOverlay() {
+  const input = document.getElementById('delivery-overlay-input');
+  if (!input.value.trim()) return;
+  _syncOverlayToMain(input);
+  closeDeliveryOverlay();
+  setTimeout(() => handleAddDelivery(), 80);
+}
