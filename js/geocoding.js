@@ -248,22 +248,23 @@ function openDeliveryOverlay() {
   const overlay = document.getElementById('delivery-overlay');
   const input = document.getElementById('delivery-overlay-input');
   overlay.classList.add('visible');
+  document.body.classList.add('overlay-open');
   if (state.startPoint && input._autocomplete) {
     const center = new google.maps.LatLng(state.startPoint.lat, state.startPoint.lng);
     input._autocomplete.setOptions({ location: center, radius: 30000, strictBounds: false });
   }
-  setTimeout(() => { input.focus(); showFreqDropdown('delivery-overlay-input', 'freq-delivery-overlay'); }, 50);
+  input.focus();
 }
 
 function closeDeliveryOverlay() {
   const overlay = document.getElementById('delivery-overlay');
   overlay.classList.remove('visible');
+  document.body.classList.remove('overlay-open');
   const input = document.getElementById('delivery-overlay-input');
   input.value = '';
   input.dataset.lat = ''; input.dataset.lng = '';
   input.dataset.formatted = ''; input.dataset.resolved = ''; input.dataset.placeName = '';
   document.getElementById('delivery-overlay-clear').style.display = 'none';
-  document.getElementById('freq-delivery-overlay').classList.remove('visible');
 }
 
 function clearDeliveryOverlayInput() {
